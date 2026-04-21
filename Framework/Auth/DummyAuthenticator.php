@@ -2,8 +2,10 @@
 
 namespace Framework\Auth;
 
+use App\Models\User;
 use Framework\Core\App;
 use Framework\Core\IIdentity;
+use http\Exception\RuntimeException;
 
 /**
  * Class DummyAuthenticator
@@ -28,9 +30,17 @@ class DummyAuthenticator extends SessionAuthenticator
 
     protected function authenticate(string $username, string $password): ?IIdentity
     {
-        if ($username === self::LOGIN && password_verify($password, self::PASSWORD_HASH)) {
-            return new DummyUser(self::USERNAME);
+        $users = User::getAll('username = ?', [$username], null, 1);
+        $user = $users[0] ?? null;
+
+        if ($user instanceof User && password_verify($password, $user->getPassword())) {
+            return $user;
         }
+
+        if ($username === self::LOGIN && password_verify($password, self::PASSWORD_HASH)) {
+            return new User(self::USERNAME);
+        }
+
         return null;
     }
 }
