@@ -9,6 +9,11 @@ use Framework\Http\Responses\Response;
 
 class EmployeeController extends BaseController
 {
+    public function authorize(Request $request, string $action): bool
+    {
+        return $this->user->isLoggedIn();
+    }
+
     public function index(Request $request): Response
     {
 

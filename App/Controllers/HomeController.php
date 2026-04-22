@@ -40,19 +40,6 @@ class HomeController extends BaseController
     public function index(Request $request): Response
     {
         //return $this->redirect($this->url('auth.login'));
-        return $this->html();
-    }
-
-    /**
-     * Displays the contact page.
-     *
-     * This action serves the HTML view for the contact page, which is accessible to all users without any
-     * authorization.
-     *
-     * @return Response The response object containing the rendered HTML for the contact page.
-     */
-    public function contact(Request $request): Response
-    {
-        return $this->html();
+        return $this->redirect($this->url("auth.login"));
     }
 }

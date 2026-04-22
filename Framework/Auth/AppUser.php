@@ -56,6 +56,11 @@ class AppUser
         return $this->identity?->getName();
     }
 
+    public function isAdmin(): bool
+    {
+        return ($this->identity !== null and strcmp($this->identity->getName(), "admin") === 0);
+    }
+
     /**
      * Magic method to forward calls to the identity object if it exists.
      *

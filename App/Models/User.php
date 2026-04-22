@@ -54,8 +54,8 @@ class User extends Model implements IIdentity
         $this->employeeId = $employeeId;
     }
 
-        public function setPassword(string $password): void
-        {
-            $this->password = password_hash($password, PASSWORD_DEFAULT);
-        }
+    public function setPassword(string $password): void
+    {
+        $this->password = password_hash($password, PASSWORD_DEFAULT);
+    }
 }

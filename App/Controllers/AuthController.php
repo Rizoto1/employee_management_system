@@ -49,8 +49,10 @@ class AuthController extends BaseController
         $logged = null;
         if ($request->hasValue('submit')) {
             $logged = $this->app->getAuthenticator()->login($request->value('username'), $request->value('password'));
-            if ($logged) {
+            if ($logged and strcmp($request->value('username'), "admin") === 0) {
                 return $this->redirect($this->url("admin.index"));
+            } elseif ($logged) {
+                return $this->redirect($this->url("employee.index"));
             }
         }
 
