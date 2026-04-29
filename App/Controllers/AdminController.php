@@ -2,7 +2,9 @@
 
 namespace App\Controllers;
 
+use App\Models\Employee;
 use Framework\Core\BaseController;
+use Framework\Http\HttpException;
 use Framework\Http\Request;
 use Framework\Http\Responses\Response;
 
@@ -40,5 +42,53 @@ class AdminController extends BaseController
     public function index(Request $request): Response
     {
         return $this->html();
+    }
+
+    public function add(Request $request): Response
+    {
+        if (!$request->isPost()) {
+            return $this->html();
+        }
+
+        if ($request->post('firstName') === null) {
+            return $this->html();
+        }
+
+        $employee = new Employee();
+        $employee->setFirstName($request->post('firstName'));
+        $employee->setLastName($request->post('lastName'));
+        $employee->setEmail($request->post('email'));
+        $employee->setPhone($request->post('phone'));
+        $employee->setAddress($request->post('address'));
+        $employee->setBirthDate($request->post('birthDate'));
+        $employee->setDepartmentId(null);
+        $employee->setPosition($request->post('position'));
+        $employee->setHireDate($request->post('hireDate'));
+
+        $employee->save();
+        return $this->html();
+    }
+
+    public function edit(Request $request): Response
+    {
+        return $this->html();
+    }
+
+    public function delete(Request $request): Response
+    {
+        return $this->html();
+    }
+
+    public function show(Request $request): Response
+    {
+        try {
+            return $this->html(
+                [
+                    'employees' => Employee::getAll()
+                ]
+            );
+        } catch (\Exception $e) {
+            throw new \HttpException(500, "DB Chyba: " . $e->getMessage());
+        }
     }
 }

@@ -21,17 +21,33 @@
     <div class="row h-100 flex-nowrap"> <!-- h-100 - to have sidebar and others full height, flex-nowrap - helped with fixed topbar -->
 
         <!-- SIDEBAR -->
+
         <div class="col-2 bg-dark text-white p-3 d-flex flex-column align-items-center">
+            <?php if($user->isAdmin()) {?>
+                <a href="<?= $link->url("admin.index")?>">
+                    <button type="button" class="btn btn-primary m-2">Home</button>
+                </a>
+                <a href="<?= $link->url("admin.show")?>">
+                    <button type="button" class="btn btn-primary m-2">Employees</button>
+                </a>
+                <a href="<?= $link->url("admin.add")?>">
+                    <button type="button" class="btn btn-primary m-2">Add employee</button>
+                </a>
+                <a href="<?= $link->url("auth.logout")?>">
+                    <button type="button" class="btn btn-primary m-2">Log out</button>
+                </a>
+            <?php } else { ?>
+                <a href="<?= $link->url("employee.index")?>">
+                    <button type="button" class="btn btn-primary m-2">Home</button>
+                </a>
 
-            <a href="<?= $link->url("employee.index")?>">
                 <button type="button" class="btn btn-primary m-2">Home</button>
-            </a>
+                <button type="button" class="btn btn-primary m-2">Home</button>
+                <button type="button" class="btn btn-primary m-2">Home</button>
+                <button type="button" class="btn btn-primary m-2">Home</button>
+                <button type="button" class="btn btn-primary m-2">Home</button>
+            <?php } ?>
 
-            <button type="button" class="btn btn-primary m-2">Home</button>
-            <button type="button" class="btn btn-primary m-2">Home</button>
-            <button type="button" class="btn btn-primary m-2">Home</button>
-            <button type="button" class="btn btn-primary m-2">Home</button>
-            <button type="button" class="btn btn-primary m-2">Home</button>
         </div>
 
         <!-- RIGHT SIDE -->

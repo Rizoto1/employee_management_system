@@ -58,7 +58,7 @@ class AppUser
 
     public function isAdmin(): bool
     {
-        return ($this->identity !== null and strcmp($this->identity->getName(), "admin") === 0);
+        return ($this->identity !== null and strcmp($this->identity->getName(), "Admin") === 0);
     }
 
     /**

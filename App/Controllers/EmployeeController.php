@@ -11,12 +11,12 @@ class EmployeeController extends BaseController
 {
     public function authorize(Request $request, string $action): bool
     {
-        return $this->user->isLoggedIn();
+        return $this->user->isLoggedIn() and !($this->user->isAdmin());
     }
 
     public function index(Request $request): Response
     {
-
         return $this->html();
     }
+
 }

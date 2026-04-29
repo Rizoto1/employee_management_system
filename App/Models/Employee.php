@@ -67,6 +67,13 @@ class Employee extends Model
         return $this->hireDate;
     }
 
+    public function getAge(): int
+    {
+        $birthDate = new \DateTime($this->birthDate);
+        $age = (new \DateTime())->diff($birthDate)->y;
+        return $age;
+    }
+
     public function setId(int $id): void
     {
         $this->id = $id;
