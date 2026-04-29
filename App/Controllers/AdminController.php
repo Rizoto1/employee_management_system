@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\Employee;
+use App\Models\User;
 use Framework\Core\BaseController;
 use Framework\Http\HttpException;
 use Framework\Http\Request;
@@ -64,8 +65,16 @@ class AdminController extends BaseController
         $employee->setDepartmentId(null);
         $employee->setPosition($request->post('position'));
         $employee->setHireDate($request->post('hireDate'));
-
         $employee->save();
+
+        $employeeId = $employee->getId();
+        $user = new User();
+        $result = strtolower(iconv('UTF-8', 'ASCII//TRANSLIT', $employee->getLastName()));
+        $user->setUsername($result);
+        $user->setPassword($result);
+        $user->setEmployeeId($employeeId);
+
+        $user->save();
         return $this->html();
     }
 

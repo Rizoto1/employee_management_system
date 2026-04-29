@@ -16,6 +16,7 @@
                 <th>Hire date</th>
                 <th>Department</th>
                 <th>Position</th>
+                <th>Action</th>
             </tr>
             <?php foreach ($employees as $employee) { ?>
                 <tr>
@@ -29,6 +30,19 @@
                     <td><?= $employee->getHireDate()?></td>
                     <td><?= $employee->getDepartmentId()?></td>
                     <td><?= $employee->getPosition()?></td>
+
+                    <td>
+                        <a href="<?= $link->url('edit', ['id' => $employee->getId()]) ?>"
+                           class="btn btn-sm btn-primary">
+                            Edit
+                        </a>
+
+                        <a href="<?= $link->url('delete', ['id' => $employee->getId()]) ?>"
+                           class="btn btn-sm btn-danger"
+                           onclick="confirm('Do you really want to delete employee?');">
+                            Delete
+                        </a>
+                    </td>
                 </tr>
 
             <?php }?>
