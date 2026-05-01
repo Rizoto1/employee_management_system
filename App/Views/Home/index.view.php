@@ -3,10 +3,10 @@
 /** @var \Framework\Support\LinkGenerator $link */
 ?>
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col mt-5">
-            <div class="text-center">
+<div class="col col-sm-auto">
+    <nav class="navbar navbar-expand-sm bg-light">
+
+    </nav>
                 <h2>Vaííčko MVC FW</h2>
                 <h3>Version <?= App\Configuration::FW_VERSION ?></h3>
                 <img src="<?= $link->asset('images/vaiicko_logo.png') ?>" alt="Framework Logo">
@@ -33,7 +33,5 @@
                 <a href="mailto:Matej.Mesko@fri.uniza.sk">Ing. Matej Meško, PhD.</a><br><br>
                 &copy; 2020-<?= date('Y') ?> University of Žilina, Faculty of Management Science and Informatics,
                 Department of Software Technologies
-            </div>
-        </div>
-    </div>
+
 </div>

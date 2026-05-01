@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Models\Absence;
+use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\User;
 use Framework\Core\BaseController;
@@ -80,12 +82,39 @@ class AdminController extends BaseController
 
     public function edit(Request $request): Response
     {
-        return $this->html();
+        $id = (int)$request->value('id');
+
+        try {
+            return $this->html(
+                [
+                    'employee' => Employee::getOne($id),
+                    'attendances' => Attendance::getAll('`employeeId` LIKE ?', [$id]),
+                    'absences' => Absence::getAll('`employeeId` LIKE ?', [$id])
+                ]
+            );
+        } catch (\Exception $e) {
+            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+        }
     }
 
     public function delete(Request $request): Response
     {
-        return $this->html();
+        try {
+            $id = (int)$request->value('id');
+            $employee = Employee::getOne($id);
+
+            if (is_null($employee)) {
+                throw new HttpException(404);
+            }
+
+            Employee::deleteRelated($id);
+            $employee->delete();
+
+        } catch (Exception $e) {
+            throw new HttpException(500, 'DB Error:: ' . $e->getMessage());
+        }
+
+        return $this->redirect($this->url("admin.show"));
     }
 
     public function show(Request $request): Response

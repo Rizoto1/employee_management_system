@@ -7,7 +7,7 @@ use Framework\Core\Model;
 class Attendance extends Model
 {
     protected ?int $id = null;
-    protected int $employee_id = 0;
+    protected int $employeeId = 0;
     protected string $checkInTime = '';
     protected string $checkOutTime = '';
     protected string $status = '';
@@ -19,7 +19,7 @@ class Attendance extends Model
 
     public function getEmployeeId(): int
     {
-        return $this->employee_id;
+        return $this->employeeId;
     }
 
     public function getCheckInTime(): string
@@ -44,7 +44,7 @@ class Attendance extends Model
 
     public function setEmployeeId(int $employeeId): void
     {
-        $this->employeeID = $employeeId;
+        $this->employeeId = $employeeId;
     }
 
     public function setCheckInTime(string $checkInTime): void

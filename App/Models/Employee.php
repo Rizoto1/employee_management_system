@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Framework\Core\Model;
+use Framework\DB\Connection;
 
 class Employee extends Model
 {
@@ -124,4 +125,16 @@ class Employee extends Model
         $this->hireDate = $hireDate;
     }
 
+    public static function deleteRelated(int $id): void
+    {
+        $con = Connection::getInstance();
+        $stmt = $con->prepare("DELETE FROM users WHERE employeeId = :id");
+        $stmt->execute(['id' => $id]);
+
+        $stmt = $con->prepare("DELETE FROM absences WHERE employeeId = :id");
+        $stmt->execute(['id' => $id]);
+
+        $stmt = $con->prepare("DELETE FROM attendances WHERE employeeId = :id");
+        $stmt->execute(['id' => $id]);
+    }
 }

@@ -1,3 +1,10 @@
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS attendances;
+DROP TABLE IF EXISTS absences;
+DROP TABLE IF EXISTS employees;
+DROP TABLE IF EXISTS absence_types;
+DROP TABLE IF EXISTS departments;
+
 CREATE TABLE departments
 (
     id              INT PRIMARY KEY AUTO_INCREMENT,
