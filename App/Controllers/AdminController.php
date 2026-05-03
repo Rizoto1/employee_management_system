@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\Absence;
 use App\Models\Attendance;
 use App\Models\Employee;
+use App\Models\Department;
 use App\Models\User;
 use Framework\Core\BaseController;
 use Framework\Http\HttpException;
@@ -50,11 +51,7 @@ class AdminController extends BaseController
     public function add(Request $request): Response
     {
         if (!$request->isPost()) {
-            return $this->html();
-        }
-
-        if ($request->post('firstName') === null) {
-            return $this->html();
+            return $this->html(['departments' => Department::getAll()]);
         }
 
         $employee = new Employee();
@@ -77,7 +74,7 @@ class AdminController extends BaseController
         $user->setEmployeeId($employeeId);
 
         $user->save();
-        return $this->html();
+        return $this->html(['departments' => Department::getAll()]);
     }
 
     public function edit(Request $request): Response
@@ -89,12 +86,35 @@ class AdminController extends BaseController
                 [
                     'employee' => Employee::getOne($id),
                     'attendances' => Attendance::getAll('`employeeId` LIKE ?', [$id]),
-                    'absences' => Absence::getAll('`employeeId` LIKE ?', [$id])
+                    'absences' => Absence::getAll('`employeeId` LIKE ?', [$id]),
+                    'departments' => Department::getAll()
                 ]
             );
         } catch (\Exception $e) {
             throw new HttpException(500, "DB Chyba: " . $e->getMessage());
         }
+    }
+
+    public function updateEmployee(Request $request): Response {
+        if (!$request->isPost()) {
+            return $this->redirect($this->url("admin.edit", ['id' => $request->post('id')]));
+        }
+
+        $employee = Employee::getOne((int)$request->post('id'));
+
+        $employee->setFirstName($request->post('firstName'));
+        $employee->setLastName($request->post('lastName'));
+        $employee->setEmail($request->post('email'));
+        $employee->setPhone($request->post('phone'));
+        $employee->setAddress($request->post('address'));
+        $employee->setBirthDate($request->post('birthDate'));
+        $employee->setDepartmentId($request->post('departmentId') !== '0' ? (int)$request->post('departmentId') : null);
+        $employee->setPosition($request->post('position'));
+        $employee->setHireDate($request->post('hireDate'));
+
+        $employee->save();
+
+        return $this->redirect($this->url("admin.edit", ['id' => $request->post('id')]));
     }
 
     public function delete(Request $request): Response

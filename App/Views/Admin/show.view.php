@@ -20,16 +20,16 @@
             </tr>
             <?php foreach ($employees as $employee) { ?>
                 <tr>
-                    <td><?= $employee->getId()?></td>
-                    <td><?= $employee->getFirstName()?></td>
-                    <td><?= $employee->getLastName()?></td>
-                    <td><?= $employee->getAddress()?></td>
-                    <td><?= $employee->getEmail()?></td>
-                    <td><?= $employee->getPhone()?></td>
-                    <td><?= $employee->getAge()?></td>
-                    <td><?= $employee->getHireDate()?></td>
-                    <td><?= $employee->getDepartmentId()?></td>
-                    <td><?= $employee->getPosition()?></td>
+                    <td><?= htmlspecialchars($employee->getId(), ENT_QUOTES);?></td>
+                    <td><?= htmlspecialchars($employee->getFirstName(), ENT_QUOTES);?></td>
+                    <td><?= htmlspecialchars($employee->getLastName(), ENT_QUOTES);?></td>
+                    <td><?= htmlspecialchars($employee->getAddress(), ENT_QUOTES);?></td>
+                    <td><?= htmlspecialchars($employee->getEmail(), ENT_QUOTES);?></td>
+                    <td><?= htmlspecialchars($employee->getPhone(), ENT_QUOTES);?></td>
+                    <td><?= htmlspecialchars($employee->getAge(), ENT_QUOTES);?></td>
+                    <td><?= htmlspecialchars($employee->getHireDate(), ENT_QUOTES);?></td>
+                    <td><?= htmlspecialchars($employee->getDepartment() !== null ? $employee->getDepartment()->getName() : '-', ENT_QUOTES);?></td>
+                    <td><?= htmlspecialchars($employee->getPosition(), ENT_QUOTES);?></td>
 
                     <td>
                         <a href="<?= $link->url('edit', ['id' => $employee->getId()]) ?>"

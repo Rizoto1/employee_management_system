@@ -1,53 +1,54 @@
 <?php
 /** @var \Framework\Support\LinkGenerator $link */
+/** @var \App\Models\Department[] $departments */
 ?>
 
 <div class="container">
-    <form method="post" action="<?= $link->url("add") ?>">
+    <form method="post" action="<?= $link->url('admin.add')?>">
         <div class="mb-3">
             <label for="firstName" class="form-label">First name</label>
-            <input type="text" class="form-control" id="firstName" name="firstName" required maxlength="254"
-                   placeholder="Insert first name here">
+            <input id="firstName" type="text" name="firstName" class="form-control" placeholder="Insert first name here" required />
         </div>
         <div class="mb-3">
             <label for="lastName" class="form-label">Last name</label>
-            <input type="text" class="form-control" id="lastName" name="lastName" required maxlength="254"
-                   placeholder="Insert last name here">
-        </div>
-        <div class="mb-3">
-            <label for="birthDate" class="form-label">Birth date</label>
-            <input type="date" class="form-control" id="birthDate" name="birthDate" required maxlength="254"
-                   placeholder="Insert birth date here">
+            <input id="lastName" type="text" name="lastName" class="form-control" placeholder="Insert last name here" required />
         </div>
         <div class="mb-3">
             <label for="address" class="form-label">Address</label>
-            <input type="text" class="form-control" id="address" name="address" required maxlength="254"
-                   placeholder="Insert address here">
+            <input id="address" type="text" name="address" class="form-control" placeholder="Insert address here" required />
         </div>
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="text" class="form-control" id="email" name="email" required maxlength="254"
-                   placeholder="Insert email here">
+            <input id="email" type="text" name="email" class="form-control" placeholder="Insert email here" required />
         </div>
         <div class="mb-3">
-            <label for="phone" class="form-label">Phone</label>
-            <input type="text" class="form-control" id="phone" name="phone" required maxlength="254"
-                   placeholder="Insert phone here">
+            <label for="phone" class="form-label">Phone number</label>
+            <input id="phone" type="text" name="phone" class="form-control" placeholder="Insert phone number here" required />
         </div>
         <div class="mb-3">
-            <label for="position" class="form-label">Position</label>
-            <input type="text" class="form-control" id="position" name="position" required maxlength="254"
-                   placeholder="Insert position here">
+            <label for="birthDate" class="form-label">Birth date</label>
+            <input id="birthDate" type="date" name="birthDate" class="form-control" required onfocus="this.showPicker()" />
         </div>
         <div class="mb-3">
             <label for="hireDate" class="form-label">Hire date</label>
-            <input type="date" class="form-control" id="hireDate" name="hireDate" required maxlength="254"
-                   placeholder="Insert hire date here">
+            <input id="hireDate" type="date" name="hireDate" class="form-control" required onfocus="this.showPicker()" />
         </div>
-
-        <a href="<?= $link->url("add")?>">
-            <button type="submit" class="btn-primary">save</button>
-        </a>
+        <div class="mb-3">
+            <label for="departmentId" class="form-label">Department: </label>
+            <select name="departmentId" id="departmentId">
+                <option value="0" selected></option>
+                <?php foreach ($departments as $department) { ?>
+                    <option value="<?= htmlspecialchars($department->getId(), ENT_QUOTES); ?>">
+                        <?= htmlspecialchars($department->getName(), ENT_QUOTES); ?>
+                    </option>
+                <?php } ?>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="position" class="form-label">Position</label>
+            <input id="position" type="text" name="position" class="form-control" placeholder="Insert position here" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
     </form>
 
 </div>

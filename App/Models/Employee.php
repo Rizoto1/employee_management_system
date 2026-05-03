@@ -63,6 +63,11 @@ class Employee extends Model
         return $this->departmentId;
     }
 
+    public function getDepartment(): ?Department
+    {
+        return Department::getOne($this->departmentId);
+    }
+
     public function getHireDate(): string
     {
         return $this->hireDate;
@@ -118,6 +123,14 @@ class Employee extends Model
     public function setDepartmentId(?int $departmentId): void
     {
         $this->departmentId = $departmentId;
+    }
+
+    public function setDepartment(?string $name): void
+    {
+        $dep = Department::getAll('`name` LIKE ?', [$name]);
+        if (!empty($dep)) {
+            $this->departmentId = $dep[0]->getId();
+        }
     }
 
     public function setHireDate(string $hireDate): void
