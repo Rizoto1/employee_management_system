@@ -10,7 +10,7 @@ class Attendance extends Model
     protected int $employeeId = 0;
     protected string $checkInTime = '';
     protected string $checkOutTime = '';
-    protected string $status = '';
+    protected int $statusId = 0;
 
     public function getId(): ?int
     {
@@ -32,9 +32,9 @@ class Attendance extends Model
         return $this->checkOutTime;
     }
 
-    public function getStatus(): string
+    public function getStatusId(): int
     {
-        return $this->status;
+        return $this->statusId;
     }
 
     public function setId(int $id): void
@@ -57,8 +57,8 @@ class Attendance extends Model
         $this->checkOutTime = $checkOutTime;
     }
 
-    public function setStatus(string $status): void
+    public function setStatusId(int $statusId): void
     {
-        $this->status = $status;
+        $this->statusId = $statusId;
     }
 }

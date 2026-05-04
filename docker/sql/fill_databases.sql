@@ -25,16 +25,22 @@ INSERT INTO users (username, password, employeeId) VALUES
                                                        ('mvarga', '$2y$10$wH8Q5Pq8kz8yQv1Q7u8k7e5Q5zK5vQ0y8r5K5Y5K5z5Y5K5z5Y5K5', 4),
                                                        ('ebielikova', '$2y$10$wH8Q5Pq8kz8yQv1Q7u8k7e5Q5zK5vQ0y8r5K5Y5K5z5Y5K5z5Y5K5', 5);
 
+INSERT INTO statustypes (name) VALUES
+                                   ('present'),
+                                   ('sick'),
+                                   ('home_office'),
+                                   ('vacation');
+
 -- attendances
-INSERT INTO attendances (employeeId, checkInTime, checkOutTime, status) VALUES
-                                                                            (1, '2026-04-01 08:00:00', '2026-04-01 16:00:00', 'present'),
-                                                                            (2, '2026-04-01 08:30:00', '2026-04-01 16:30:00', 'present'),
-                                                                            (3, '2026-04-01 09:00:00', '2026-04-01 17:00:00', 'home_office'),
-                                                                            (4, '2026-04-01 08:00:00', '2026-04-01 15:00:00', 'sick'),
-                                                                            (5, '2026-04-01 07:45:00', '2026-04-01 15:45:00', 'present');
+INSERT INTO attendances (employeeId, checkInTime, checkOutTime, statusId) VALUES
+                                                                            (1, '2026-04-01 08:00:00', '2026-04-01 16:00:00', 1),
+                                                                            (2, '2026-04-01 08:30:00', '2026-04-01 16:30:00', 1),
+                                                                            (3, '2026-04-01 09:00:00', '2026-04-01 17:00:00', 3),
+                                                                            (4, '2026-04-01 08:00:00', '2026-04-01 15:00:00', 2),
+                                                                            (5, '2026-04-01 07:45:00', '2026-04-01 15:45:00', 1);
 
 -- absence_types
-INSERT INTO absence_types (name, description) VALUES
+INSERT INTO absencetypes (name, description) VALUES
                                                   ('Sick Leave', 'Illness'),
                                                   ('Vacation', 'Paid vacation'),
                                                   ('Home Office', 'Work from home'),
@@ -42,9 +48,10 @@ INSERT INTO absence_types (name, description) VALUES
                                                   ('Business Trip', 'Work travel');
 
 -- absences
-INSERT INTO absences (employeeId, absenceTypeId, startDate, endDate, status) VALUES
-                                                                                 (1, 2, '2026-03-01', '2026-03-05', 'vacation'),
-                                                                                 (2, 1, '2026-02-10', '2026-02-12', 'sick'),
-                                                                                 (3, 3, '2026-01-15', '2026-01-15', 'home_office'),
-                                                                                 (4, 4, '2026-04-10', '2026-04-12', 'present'),
-                                                                                 (5, 5, '2026-03-20', '2026-03-22', 'present');
+INSERT INTO absences (employeeId, absenceTypeId, startDate, endDate, statusId) VALUES
+                                                                                 (1, 2, '2026-03-01', '2026-03-05', 2),
+                                                                                 (2, 1, '2026-02-10', '2026-02-12', 3),
+                                                                                 (3, 3, '2026-01-15', '2026-01-15', 4),
+                                                                                 (4, 4, '2026-04-10', '2026-04-12', 1),
+                                                                                 (5, 5, '2026-03-20', '2026-03-22', 2);
+

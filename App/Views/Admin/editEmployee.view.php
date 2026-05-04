@@ -4,6 +4,7 @@
 /** @var \App\Models\Attendance[] $attendances */
 /** @var \App\Models\Absence[] $absences */
 /** @var \App\Models\Department[] $departments */
+use App\Models\StatusType;
 ?>
 
 <div class="container">
@@ -11,12 +12,11 @@
 
     <div class="card mb-3">
         <div class="card-body">
-            <form method="post" action="<?= $link->url('admin.updateEmployee')?>">
-                <div class="mb-3"  style="display: none">
+            <form method="post" action="<?= $link->url('admin.updateEmployee') ?>">
+                <div class="mb-3">
                     <label for="id" class="form-label">Id</label>
-                    <input id="id" type="text" name="id" class="form-control" value="<?= htmlspecialchars($employee->getId(), ENT_QUOTES) ?>" />
+                    <input id="id" type="text" name="id" class="form-control" value="<?= htmlspecialchars($employee->getId(), ENT_QUOTES); ?>" readonly />
                 </div>
-
                 <div class="mb-3">
                     <label for="firstName" class="form-label">First name</label>
                     <input id="firstName" type="text" name="firstName" class="form-control" value="<?= htmlspecialchars($employee->getFirstName(), ENT_QUOTES); ?>" required />
@@ -65,6 +65,9 @@
                     <input id="position" type="text" name="position" class="form-control" value="<?= htmlspecialchars($employee->getPosition(), ENT_QUOTES); ?>" required />
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
+                <a href="<?= $link->url('admin.show') ?>" class="btn btn-secondary">
+                    Back
+                </a>
             </form>
         </div>
     </div>
@@ -77,13 +80,28 @@
                 <th>Employee ID</th>
                 <th>Time in</th>
                 <th>Time out</th>
+                <th>Status</th>
+                <th>Actions</th>
             </tr>
             <?php foreach ($attendances as $attendance) { ?>
                 <tr>
-                    <td><?= $attendance->getId() ?></td>
-                    <td><?= $attendance->getEmployeeId() ?></td>
-                    <td><?= $attendance->getCheckInTime() ?></td>
-                    <td><?= $attendance->getCheckOutTime() ?></td>
+                    <td><?= htmlspecialchars($attendance->getId(), ENT_QUOTES);  ?></td>
+                    <td><?= htmlspecialchars($attendance->getEmployeeId(), ENT_QUOTES);  ?></td>
+                    <td><?= htmlspecialchars($attendance->getCheckInTime(), ENT_QUOTES);  ?></td>
+                    <td><?= htmlspecialchars($attendance->getCheckOutTime(), ENT_QUOTES);  ?></td>
+                    <td><?= htmlspecialchars(StatusType::getOne($attendance->getStatusId())->getName(), ENT_QUOTES);  ?></td>
+                    <td>
+                        <a href="<?= $link->url('admin.editAttendance', ['id' => $attendance->getId()]) ?>"
+                           class="btn btn-sm btn-primary">
+                            Edit
+                        </a>
+
+                        <a href="<?= $link->url('admin.deleteAttendance', ['id' => $attendance->getId()]) ?>"
+                           class="btn btn-sm btn-danger"
+                           onclick="confirm('Do you really want to delete attendance?');">
+                            Delete
+                        </a>
+                    </td>
                 </tr>
             <?php } ?>
         </table>
@@ -101,15 +119,28 @@
                 <th>Start</th>
                 <th>End</th>
                 <th>Status</th>
+                <th>Actions</th>
             </tr>
             <?php foreach ($absences as $absence) { ?>
                 <tr>
-                    <td><?= $absence->getId() ?></td>
-                    <td><?= $absence->getEmployeeId() ?></td>
-                    <td><?= $absence->getAbsenceTypeId()?></td>
-                    <td><?= $absence->getStartDate() ?></td>
-                    <td><?= $absence->getEndDate() ?></td>
-                    <td><?= $absence->getStatus() ?></td>
+                    <td><?= htmlspecialchars($absence->getId(), ENT_QUOTES);  ?></td>
+                    <td><?= htmlspecialchars($absence->getEmployeeId(), ENT_QUOTES);  ?></td>
+                    <td><?= htmlspecialchars($absence->getAbsenceTypeId(), ENT_QUOTES); ?></td>
+                    <td><?= htmlspecialchars($absence->getStartDate(), ENT_QUOTES);  ?></td>
+                    <td><?= htmlspecialchars($absence->getEndDate(), ENT_QUOTES);  ?></td>
+                    <td><?= htmlspecialchars(StatusType::getOne($absence->getStatusId())->getName(), ENT_QUOTES);  ?></td>
+                    <td>
+                        <a href="<?= $link->url('admin.editAbsence', ['id' => $employee->getId()]) ?>"
+                           class="btn btn-sm btn-primary">
+                            Edit
+                        </a>
+
+                        <a href="<?= $link->url('admin.deleteAbsence', ['id' => $employee->getId()]) ?>"
+                           class="btn btn-sm btn-danger"
+                           onclick="confirm('Do you really want to delete absence?');">
+                            Delete
+                        </a>
+                    </td>
                 </tr>
             <?php } ?>
         </table>

@@ -4,7 +4,7 @@
 ?>
 
 <div class="container">
-    <form method="post" action="<?= $link->url('admin.add')?>">
+    <form method="post" action="<?= $link->url('admin.addEmployee')?>">
         <div class="mb-3">
             <label for="firstName" class="form-label">First name</label>
             <input id="firstName" type="text" name="firstName" class="form-control" placeholder="Insert first name here" required />

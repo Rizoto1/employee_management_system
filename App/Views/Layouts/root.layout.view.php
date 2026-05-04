@@ -30,7 +30,7 @@
                 <a href="<?= $link->url("admin.show")?>">
                     <button type="button" class="btn btn-primary m-2">Employees</button>
                 </a>
-                <a href="<?= $link->url("admin.add")?>">
+                <a href="<?= $link->url("admin.addEmployee")?>">
                     <button type="button" class="btn btn-primary m-2">Add employee</button>
                 </a>
                 <a href="<?= $link->url("auth.logout")?>">

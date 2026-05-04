@@ -2,8 +2,9 @@ DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS attendances;
 DROP TABLE IF EXISTS absences;
 DROP TABLE IF EXISTS employees;
-DROP TABLE IF EXISTS absence_types;
+DROP TABLE IF EXISTS absencetypes;
 DROP TABLE IF EXISTS departments;
+DROP TABLE IF EXISTS statustypes;
 
 CREATE TABLE departments
 (
@@ -38,19 +39,26 @@ CREATE TABLE users
     FOREIGN KEY (employeeId) REFERENCES employees(id)
 );
 
+CREATE TABLE statustypes
+(
+    id              INT PRIMARY KEY AUTO_INCREMENT,
+    name            VARCHAR(20) NOT NULL
+);
+
 CREATE TABLE attendances
 (
     id              INT PRIMARY KEY AUTO_INCREMENT,
     employeeId      INT NOT NULL,
     checkInTime     DATETIME NOT NULL,
     checkOutTime    DATETIME NULL,
-    status          ENUM('present','sick','vacation','home_office') NOT NULL,
+    statusId        INT NOT NULL,
 
     CHECK (checkOutTime >= checkInTime),
-    FOREIGN KEY (employeeId) REFERENCES employees(id)
+    FOREIGN KEY (employeeId) REFERENCES employees(id),
+    FOREIGN KEY (statusId) REFERENCES statustypes(id)
 );
 
-CREATE TABLE absence_types
+CREATE TABLE absencetypes
 (
     id              INT PRIMARY KEY AUTO_INCREMENT,
     name            VARCHAR(50) NOT NULL,
@@ -64,9 +72,10 @@ CREATE TABLE absences
     absenceTypeId   INT NOT NULL,
     startDate       DATE NOT NULL,
     endDate         DATE NOT NULL,
-    status          ENUM('present','sick','vacation','home_office') NOT NULL,
+    statusId        INT NOT NULL,
 
     CHECK (endDate >= startDate),
     FOREIGN KEY (employeeId) REFERENCES employees(id),
-    FOREIGN KEY (absenceTypeId) REFERENCES absence_types(id)
+    FOREIGN KEY (absenceTypeId) REFERENCES absencetypes(id),
+    FOREIGN KEY (statusId) REFERENCES statustypes(id)
 );

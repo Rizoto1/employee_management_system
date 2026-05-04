@@ -6,6 +6,8 @@ use App\Models\Absence;
 use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\Department;
+use App\Models\StatusType;
+use App\Models\AbsenceType;
 use App\Models\User;
 use Framework\Core\BaseController;
 use Framework\Http\HttpException;
@@ -48,7 +50,7 @@ class AdminController extends BaseController
         return $this->html();
     }
 
-    public function add(Request $request): Response
+    public function addEmployee(Request $request): Response
     {
         if (!$request->isPost()) {
             return $this->html(['departments' => Department::getAll()]);
@@ -77,11 +79,10 @@ class AdminController extends BaseController
         return $this->html(['departments' => Department::getAll()]);
     }
 
-    public function edit(Request $request): Response
+    public function editEmployee(Request $request): Response
     {
-        $id = (int)$request->value('id');
-
         try {
+            $id = (int)$request->value('id');
             return $this->html(
                 [
                     'employee' => Employee::getOne($id),
@@ -97,7 +98,7 @@ class AdminController extends BaseController
 
     public function updateEmployee(Request $request): Response {
         if (!$request->isPost()) {
-            return $this->redirect($this->url("admin.edit", ['id' => $request->post('id')]));
+            return $this->redirect($this->url("admin.editEmployee", ['id' => $request->post('id')]));
         }
 
         $employee = Employee::getOne((int)$request->post('id'));
@@ -114,10 +115,10 @@ class AdminController extends BaseController
 
         $employee->save();
 
-        return $this->redirect($this->url("admin.edit", ['id' => $request->post('id')]));
+        return $this->redirect($this->url("admin.editEmployee", ['id' => $request->post('id')]));
     }
 
-    public function delete(Request $request): Response
+    public function deleteEmployee(Request $request): Response
     {
         try {
             $id = (int)$request->value('id');
@@ -148,5 +149,110 @@ class AdminController extends BaseController
         } catch (\Exception $e) {
             throw new \HttpException(500, "DB Chyba: " . $e->getMessage());
         }
+    }
+
+    public function editAttendance(Request $request): Response
+    {
+        try {
+            $id = (int)$request->value('id');
+            $attendance = Attendance::getOne($id);
+            if (is_null($attendance)) {
+                throw new HttpException(404);
+            }
+
+            $employee = Employee::getOne($attendance->getEmployeeId());
+            if (is_null($attendance)) {
+                throw new HttpException(404);
+            }
+
+            $statusTypes = StatusType::getAll();
+
+            return $this->html(['attendance' => $attendance, 'employee' => $employee, 'statusTypes' => $statusTypes]);
+        } catch (\Exception $e) {
+            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+        }
+    }
+
+    public function updateAttendance(Request $request): Response
+    {
+        try {
+            $id = (int)$request->value('id');
+            $attendance = Attendance::getOne($id);
+            if (is_null($attendance)) {
+                throw new HttpException(404);
+            }
+
+            $attendance->setCheckInTime($request->post('checkInTime'));
+            $attendance->setCheckOutTime($request->post('checkOutTime'));
+            $attendance->setStatusId($request->post('statusId'));
+            $attendance->save();
+
+            return $this->redirect($this->url("admin.editAttendance", ['id' => $attendance->getEmployeeId()]));
+        } catch (\Exception $e) {
+            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+        }
+    }
+
+    public function editAbsence(Request $request): Response
+    {
+        try {
+            $id = (int)$request->value('id');
+            $absence = Attendance::getOne($id);
+            if (is_null($absence)) {
+                throw new HttpException(404);
+            }
+
+            $employee = Employee::getOne($absence->getEmployeeId());
+            if (is_null($absence)) {
+                throw new HttpException(404);
+            }
+
+            $statusTypes = StatusType::getAll();
+            $absenceTypes = AbsenceType::getAll();
+
+            return $this->html(['absence' => $absence, 'employee' => $employee, 'statusTypes' => $statusTypes, 'absenceTypes' => $absenceTypes]);
+        } catch (\Exception $e) {
+            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+        }
+    }
+
+    public function deleteAttendance(Request $request): Response
+    {
+        try {
+            $id = (int)$request->value('id');
+            $attendance = Attendance::getOne($id);
+
+            if (is_null($attendance)) {
+                throw new HttpException(404);
+            }
+
+            Attendance::deleteRelated($id);
+            $attendance->delete();
+
+        } catch (Exception $e) {
+            throw new HttpException(500, 'DB Error:: ' . $e->getMessage());
+        }
+
+        return $this->redirect($this->url("admin.editEmployee", ['id' => $attendance->getEmployeeId()]));
+    }
+
+    public function deleteAbsence(Request $request): Response
+    {
+        try {
+            $id = (int)$request->value('id');
+            $absence = Absence::getOne($id);
+
+            if (is_null($absence)) {
+                throw new HttpException(404);
+            }
+
+            $absence->delete();
+
+        } catch (Exception $e) {
+            throw new HttpException(500, 'DB Error:: ' . $e->getMessage());
+        }
+
+        return $this->redirect($this->url("admin.editEmployee", ['id' => $absence->getEmployeeId()]));
+
     }
 }

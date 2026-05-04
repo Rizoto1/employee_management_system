@@ -28,16 +28,16 @@
                     <td><?= htmlspecialchars($employee->getPhone(), ENT_QUOTES);?></td>
                     <td><?= htmlspecialchars($employee->getAge(), ENT_QUOTES);?></td>
                     <td><?= htmlspecialchars($employee->getHireDate(), ENT_QUOTES);?></td>
-                    <td><?= htmlspecialchars($employee->getDepartment() !== null ? $employee->getDepartment()->getName() : '-', ENT_QUOTES);?></td>
+                    <td><?= htmlspecialchars($employee->getDepartment() !== null ? $employee->getDepartment()->getName() : '', ENT_QUOTES);?></td>
                     <td><?= htmlspecialchars($employee->getPosition(), ENT_QUOTES);?></td>
 
                     <td>
-                        <a href="<?= $link->url('edit', ['id' => $employee->getId()]) ?>"
+                        <a href="<?= $link->url('editEmployee', ['id' => $employee->getId()]) ?>"
                            class="btn btn-sm btn-primary">
                             Edit
                         </a>
 
-                        <a href="<?= $link->url('delete', ['id' => $employee->getId()]) ?>"
+                        <a href="<?= $link->url('deleteEmployee', ['id' => $employee->getId()]) ?>"
                            class="btn btn-sm btn-danger"
                            onclick="confirm('Do you really want to delete employee?');">
                             Delete
