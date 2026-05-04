@@ -43,6 +43,9 @@
                 <a href="<?= $link->url('admin.editEmployee', ['id' => $employee->getId()]) ?>" class="btn btn-secondary">
                     Back
                 </a>
+                <a href="<?= $link->url('admin.deleteAttendance', ['id' => $attendance->getId()]) ?>" class="btn btn-danger">
+                    Delete
+                </a>
             </form>
         </div>
     </div>

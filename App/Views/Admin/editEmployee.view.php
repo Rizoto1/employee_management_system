@@ -130,12 +130,12 @@ use App\Models\StatusType;
                     <td><?= htmlspecialchars($absence->getEndDate(), ENT_QUOTES);  ?></td>
                     <td><?= htmlspecialchars(StatusType::getOne($absence->getStatusId())->getName(), ENT_QUOTES);  ?></td>
                     <td>
-                        <a href="<?= $link->url('admin.editAbsence', ['id' => $employee->getId()]) ?>"
+                        <a href="<?= $link->url('admin.editAbsence', ['id' => $absence->getId()]) ?>"
                            class="btn btn-sm btn-primary">
                             Edit
                         </a>
 
-                        <a href="<?= $link->url('admin.deleteAbsence', ['id' => $employee->getId()]) ?>"
+                        <a href="<?= $link->url('admin.deleteAbsence', ['id' => $absence->getId()]) ?>"
                            class="btn btn-sm btn-danger"
                            onclick="confirm('Do you really want to delete absence?');">
                             Delete
