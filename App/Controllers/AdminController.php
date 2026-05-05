@@ -241,6 +241,48 @@ class AdminController extends BaseController
         }
     }
 
+    public function filter(Request $request): Response
+    {
+        try {
+            $data = $request->json();
+
+            if (!is_object($data)) {
+                return $this->json([]);
+            }
+
+            $filter = $data->filter ?? null;
+            $filterValue = $data->filterValue ?? null;
+
+            if (empty($filter) || empty($filterValue)) {
+                $employees = Employee::getAll();
+                return $this->json($employees);
+            }
+
+            $allowedFilters = [
+                'firstName',
+                'lastName',
+                'email',
+                'hireDate',
+                'departmentId',
+                'position'
+            ];
+
+            if (!in_array($filter, $allowedFilters)) {
+                return $this->json([]);
+            }
+
+            if ($filter === 'departmentId') {
+                $employees = Employee::getAll("`departmentId` = ?", [(int)$filterValue]);
+            } else {
+                $employees = Employee::getAll("`$filter` LIKE ?", ["%$filterValue%"]);
+            }
+
+            return $this->json($employees);
+        } catch (\Exception $e) {
+            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+        }
+    }
+
     public function updateAbsence(Request $request): Response
     {
         try {

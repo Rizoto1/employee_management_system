@@ -3,8 +3,21 @@
 /** @var \App\Models\Employee[] $employees */
 ?>
 <div class="container">
+    <div class="mb-3">
+        <label for="filter" class="form-label">Filter: </label>
+        <select name="filter" id="filter">
+            <option value="0"></option>
+            <option value="firstName">First name</option>
+            <option value="lastName">Last name</option>
+            <option value="email">Email</option>
+            <option value="hireDate">Hire date</option>
+            <option value="departmentId">Department</option>
+            <option value="position">Position</option>
+        </select>
+        <input type="text" id="filterValue" name="filterValue" class="form-control" placeholder="Filter value">
+    </div>
     <?php if (!empty($employees)) { ?>
-        <table>
+        <table id="employeesTable">
             <tr>
                 <th>ID</th>
                 <th>First name</th>
