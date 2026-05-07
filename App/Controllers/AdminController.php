@@ -255,7 +255,8 @@ class AdminController extends BaseController
 
             if (empty($filter) || empty($filterValue)) {
                 $employees = Employee::getAll();
-                return $this->json($employees);
+                return $this->json(['employees' => $employees,
+                    'departments' => Department::getAll()]);
             }
 
             $allowedFilters = [
@@ -263,7 +264,7 @@ class AdminController extends BaseController
                 'lastName',
                 'email',
                 'hireDate',
-                'departmentId',
+                'department',
                 'position'
             ];
 
@@ -271,13 +272,20 @@ class AdminController extends BaseController
                 return $this->json([]);
             }
 
-            if ($filter === 'departmentId') {
-                $employees = Employee::getAll("`departmentId` = ?", [(int)$filterValue]);
+            if ($filter === 'department') {
+                $departments = Department::GetAll("`name` LIKE ?", ["%$filterValue%"]);
+                if(empty($departments)) {
+                    return $this->json(['employees' => Employee::getAll(),
+                                        'departments' => Department::getAll()]);
+                }
+                $department = $departments[0];
+                $employees = Employee::getAll("`departmentId` = ?", [$department->getId()]);
             } else {
                 $employees = Employee::getAll("`$filter` LIKE ?", ["%$filterValue%"]);
             }
 
-            return $this->json($employees);
+            return $this->json(['employees' => $employees,
+                                'departments' => Department::getAll()]);
         } catch (\Exception $e) {
             throw new HttpException(500, "DB Chyba: " . $e->getMessage());
         }
@@ -323,6 +331,19 @@ class AdminController extends BaseController
         }
 
         return $this->redirect($this->url("admin.editEmployee", ['id' => $absence->getEmployeeId()]));
+
+    }
+
+    public function statistics(Request $request): Response
+    {
+        $employee = Employee::getOne($request->post('employeeId'));
+        if (is_null($employee)) {
+            throw new HttpException(404);
+        }
+
+        $attendance = Attendance::getAll("`employeeId` = ?", [$employee->getId()]);
+        $absence = Absence::getAll("`employeeId` = ?", [$employee->getId()]);
+
 
     }
 }

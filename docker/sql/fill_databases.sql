@@ -19,11 +19,11 @@ INSERT INTO employees (firstName, lastName, birthDate, address, email, phone, po
 
 -- users
 INSERT INTO users (username, password, employeeId) VALUES
-                                                       ('jnovak', '$2y$10$wH8Q5Pq8kz8yQv1Q7u8k7e5Q5zK5vQ0y8r5K5Y5K5z5Y5K5z5Y5K5', 1),
-                                                       ('pkovac', '$2y$10$wH8Q5Pq8kz8yQv1Q7u8k7e5Q5zK5vQ0y8r5K5Y5K5z5Y5K5z5Y5K5', 2),
-                                                       ('lhorvathova', '$2y$10$wH8Q5Pq8kz8yQv1Q7u8k7e5Q5zK5vQ0y8r5K5Y5K5z5Y5K5z5Y5K5', 3),
-                                                       ('mvarga', '$2y$10$wH8Q5Pq8kz8yQv1Q7u8k7e5Q5zK5vQ0y8r5K5Y5K5z5Y5K5z5Y5K5', 4),
-                                                       ('ebielikova', '$2y$10$wH8Q5Pq8kz8yQv1Q7u8k7e5Q5zK5vQ0y8r5K5Y5K5z5Y5K5z5Y5K5', 5);
+                                                       ('jnovak', '$2y$10$oAo/dtYNT3d0wHkHzpc3fur7m0YMGCuNgtseqyH7k8SGzlx1tUtvW', 1),
+                                                       ('pkovac', '$2y$10$HmyAO17fjshWqY4FzLiCd.JwoSoTSBl1SAri3DaHgmwcHAcPLsp5q', 2),
+                                                       ('lhorvathova', '$2y$10$PKu7TL.dIUy/9yXi.nGzruoGBfuLDTP0AkY/qbz7gFAcdykGjZxEm', 3),
+                                                       ('mvarga', '$2y$10$U0jyYA1rkq0xZGVSFqxf1.tcYEvUnsKOY/EksE8A1zHiWSPFA4Rsy', 4),
+                                                       ('ebielikova', '$2y$10$LkvzUYNLpWUPDhPZEveAfOFNz1sGjeJFOBLTTAvnZ71y5/buaWd02', 5);
 
 INSERT INTO statustypes (name) VALUES
                                    ('present'),

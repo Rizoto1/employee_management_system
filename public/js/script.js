@@ -5,8 +5,24 @@ const filterService = new Filter();
 const input = document.getElementById('filterValue');
 const select = document.getElementById('filter');
 
+function calculateAge(birthDate) {
+    const today = new Date();
+    const birth = new Date(birthDate);
+
+    let age = today.getFullYear() - birth.getFullYear();
+
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+        age--;
+    }
+
+    return age;
+}
+
 function renderTable(data) {
     const table = document.getElementById('employeesTable');
+    const employees = data.employees;
+    const departments = data.departments;
 
     table.innerHTML = `
         <tr>
@@ -24,7 +40,7 @@ function renderTable(data) {
         </tr>
     `;
 
-    if (!data || data.length === 0) {
+    if (!employees || employees.length === 0) {
         table.innerHTML += `
             <tr>
                 <td colspan="11">No employees.</td>
@@ -33,7 +49,7 @@ function renderTable(data) {
         return;
     }
 
-    data.forEach(emp => {
+    employees.forEach(emp => {
         //${} is template string, it allows for variable values to be printed instead of the variable name
         table.innerHTML += `
             <tr>
@@ -43,9 +59,9 @@ function renderTable(data) {
                 <td>${emp.address}</td>
                 <td>${emp.email}</td>
                 <td>${emp.phone}</td>
-                <td>${emp.age}</td>
+                <td>${calculateAge(emp.birthDate)}</td>
                 <td>${emp.hireDate}</td>
-                <td>${emp.departmentId ?? ''}</td>
+                <td>${departments.find(d => d.id == emp.departmentId)?.name ?? ''}</td>
                 <td>${emp.position}</td>
                 <td>
                     <a href="?c=admin&a=editEmployee&id=${emp.id}" class="btn btn-sm btn-primary">

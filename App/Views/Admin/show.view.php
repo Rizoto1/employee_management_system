@@ -11,7 +11,7 @@
             <option value="lastName">Last name</option>
             <option value="email">Email</option>
             <option value="hireDate">Hire date</option>
-            <option value="departmentId">Department</option>
+            <option value="department">Department</option>
             <option value="position">Position</option>
         </select>
         <input type="text" id="filterValue" name="filterValue" class="form-control" placeholder="Filter value">
@@ -45,6 +45,11 @@
                     <td><?= htmlspecialchars($employee->getPosition(), ENT_QUOTES);?></td>
 
                     <td>
+                        <a href="<?= $link->url('statistics', ['id' => $employee->getId()]) ?>"
+                           class="btn btn-sm btn-secondary">
+                            Statistics
+                        </a>
+
                         <a href="<?= $link->url('editEmployee', ['id' => $employee->getId()]) ?>"
                            class="btn btn-sm btn-primary">
                             Edit
