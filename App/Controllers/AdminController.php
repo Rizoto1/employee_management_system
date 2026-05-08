@@ -344,12 +344,41 @@ class AdminController extends BaseController
             throw new HttpException(404);
         }
 
-        $attendance = Attendance::getAll("`employeeId` = ?", [$employee->getId()]);
-        $absence = Absence::getAll("`employeeId` = ?", [$employee->getId()]);
+        $date = date('Y-m');
+        [$year, $month] = explode('-', $date);
+
+        $attendance = Attendance::getAll("`employeeId` = ? AND YEAR(`checkInTime`) = ? AND MONTH(`checkInTime`) = ?",
+                                        [$employee->getId(), $year, $month]);
+        $absence = Absence::getAll("`employeeId` = ? AND YEAR(`startDate`) = ? AND MONTH(`startDate`) = ?",
+                                    [$employee->getId(), $year, $month]);
         $absenceTypes = AbsenceType::getAll();
         $statusTypes = StatusType::getAll();
 
-        return $this->html(['employee' => $employee, 'attendances' => $attendance, 'absences' => $absence, 'absenceTypes' => $absenceTypes, 'statusTypes' => $statusTypes]);
+        $absenceDays = 0;
+        $attendanceDays = 0;
+        $attendanceHours = 0;
+
+        foreach ($absence as $a) {
+            $start = new \DateTime($a->getStartDate());
+            if ($a->getEndDate() === null) {
+                $end = new \DateTime();
+            } else {
+                $end = new \DateTime($a->getEndDate());
+            }
+            $absenceDays += $start->diff($end)->days + 1;
+        }
+
+        foreach ($attendance as $a) {
+            if ($a->getCheckOutTime() !== null) {
+                $start = new \DateTime($a->getCheckInTime());
+                $end = new \DateTime($a->getCheckOutTime());
+                $attendanceHours += ($end->getTimestamp() - $start->getTimestamp()) / 3600;
+                $attendanceDays += 1;
+            }
+        }
+
+        return $this->html(['employee' => $employee, 'attendances' => $attendance, 'absences' => $absence, 'absenceTypes' => $absenceTypes, 'statusTypes' => $statusTypes,
+            'attendanceDays' => $attendanceDays, 'attendanceHours' => $attendanceHours, 'absenceDays' => $absenceDays]);
     }
 
     public function filterStatistics(Request $request): Response
@@ -367,16 +396,42 @@ class AdminController extends BaseController
             }
 
             [$year, $month] = explode('-', $date);
-            return $this->json([
-                'absences' => Absence::getAll(
-                    "`employeeId` = ? AND YEAR(`startDate`) = ? AND MONTH(`startDate`) = ?",
-                    [$data->employeeId, $year, $month]
-                ),
+            $absence = Absence::getAll("`employeeId` = ? AND YEAR(`startDate`) = ? AND MONTH(`startDate`) = ?",
+                [$data->employeeId, $year, $month]);
+            $attendance = Attendance::getAll("`employeeId` = ? AND YEAR(`checkInTime`) = ? AND MONTH(`checkInTime`) = ?",
+                [$data->employeeId, $year, $month]);
 
-                'attendances' => Attendance::getAll(
-                    "`employeeId` = ? AND YEAR(`checkInTime`) = ? AND MONTH(`checkInTime`) = ?",
-                    [$data->employeeId, $year, $month]
-                )
+            $absenceDays = 0;
+            $attendanceDays = 0;
+            $attendanceHours = 0;
+
+            foreach ($absence as $a) {
+                $start = new \DateTime($a->getStartDate());
+                if ($a->getEndDate() === null) {
+                    $end = new \DateTime();
+                } else {
+                    $end = new \DateTime($a->getEndDate());
+                }
+                $absenceDays += $start->diff($end)->days + 1;
+            }
+
+            foreach ($attendance as $a) {
+                if ($a->getCheckOutTime() !== null) {
+                    $start = new \DateTime($a->getCheckInTime());
+                    $end = new \DateTime($a->getCheckOutTime());
+                    $attendanceHours += ($end->getTimestamp() - $start->getTimestamp()) / 3600;
+                    $attendanceDays += 1;
+                }
+            }
+
+            return $this->json([
+                'absences' => $absence,
+                'attendances' => $attendance,
+                'attendanceDays' => $attendanceDays,
+                'attendanceHours' => $attendanceHours,
+                'absenceDays' => $absenceDays,
+                'absenceTypes' => AbsenceType::getAll(),
+                'statusTypes' => StatusType::getAll()
             ]);
         } catch (\Exception $e) {
             throw new HttpException(500, "DB Chyba: " . $e->getMessage());

@@ -71,7 +71,7 @@ CREATE TABLE absences
     employeeId      INT NOT NULL,
     absenceTypeId   INT NOT NULL,
     startDate       DATE NOT NULL,
-    endDate         DATE NOT NULL,
+    endDate         DATE NULL,
     statusId        INT NOT NULL,
 
     CHECK (endDate >= startDate),

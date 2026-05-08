@@ -10,7 +10,7 @@ class Absence extends Model
     protected int $employeeId;
     protected int $absenceTypeId;
     protected string $startDate;
-    protected string $endDate;
+    protected ?string $endDate;
     protected int $statusId;
 
     public function getId(): ?int
@@ -33,7 +33,7 @@ class Absence extends Model
         return $this->startDate;
     }
 
-    public function getEndDate(): string
+    public function getEndDate(): ?string
     {
         return $this->endDate;
     }

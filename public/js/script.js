@@ -2,9 +2,6 @@ import { Filter } from "./Filter.js";
 
 const filterService = new Filter();
 
-
-const dateInput = document.getElementById('statisticsDate');
-
 function calculateAge(birthDate) {
     const today = new Date();
     const birth = new Date(birthDate);
@@ -61,9 +58,12 @@ function renderTableEmployees(data) {
                 <td>${emp.phone}</td>
                 <td>${calculateAge(emp.birthDate)}</td>
                 <td>${emp.hireDate}</td>
-                <td>${departments.find(d => d.id == emp.departmentId)?.name ?? ''}</td>
+                <td>${departments.find(d => d.id === emp.departmentId)?.name ?? ''}</td>
                 <td>${emp.position}</td>
                 <td>
+                    <a href="?c=admin&a=statistics&id=${emp.id}" class="btn btn-sm btn-secondary">
+                        Statistics
+                    </a>
                     <a href="?c=admin&a=editEmployee&id=${emp.id}" class="btn btn-sm btn-primary">
                         Edit
                     </a>
@@ -81,8 +81,18 @@ function renderTableEmployees(data) {
 function renderTableEmployeeStatistics(data) {
     const absencesTable = document.getElementById('absencesTable');
     const attendancesTable = document.getElementById('attendancesTable');
+    const statisticsTableAttendanceDays = document.getElementById('attendanceDays');
+    const statisticsTableAttendanceHours = document.getElementById('attendanceHours');
+    const statisticsTableAbsenceDays = document.getElementById('absenceDays');
+
     const absences = data.absences;
     const attendances = data.attendances;
+    const absenceTypes = data.absenceTypes;
+    const statuses = data.statusTypes;
+
+    statisticsTableAttendanceDays.textContent = data.attendanceDays ?? 0;
+    statisticsTableAttendanceHours.textContent = data.attendanceHours ?? 0;
+    statisticsTableAbsenceDays.textContent = data.absenceDays ?? 0;
 
     attendancesTable.innerHTML = `
         <tr>
@@ -99,20 +109,19 @@ function renderTableEmployeeStatistics(data) {
                 <td colspan="4">No attendances.</td>
             </tr>
         `;
-        return;
-    }
-
-    attendances.forEach(att => {
-        //${} is template string, it allows for variable values to be printed instead of the variable name
-        attendancesTable.innerHTML += `
+    } else {
+        attendances.forEach(att => {
+            //${} is template string, it allows for variable values to be printed instead of the variable name
+            attendancesTable.innerHTML += `
             <tr>
                 <td>${att.id}</td> 
                 <td>${att.checkInTime}</td>
                 <td>${att.checkOutTime}</td>
-                <td>${att.statusId}</td>
+                <td>${statuses.find(s => s.id === att.statusId)?.name ?? ''}</td>
             </tr>
         `;
-    });
+        });
+    }
 
     absencesTable.innerHTML = `
         <tr>
@@ -127,7 +136,7 @@ function renderTableEmployeeStatistics(data) {
     if (!absences || absences.length === 0) {
         absencesTable.innerHTML += `
             <tr>
-                <td colspan="11">No absences.</td>
+                <td colspan="5">No absences.</td>
             </tr>
         `;
         return;
@@ -138,10 +147,10 @@ function renderTableEmployeeStatistics(data) {
         absencesTable.innerHTML += `
             <tr>
                 <td>${abs.id}</td> 
-                <td>${abs.absenceTypeId}</td>
+                <td>${absenceTypes.find(a => a.id === abs.absenceTypeId)?.name ?? ''}</td>
                 <td>${abs.startDate}</td>
                 <td>${abs.endDate}</td>
-                <td>${abs.statusId}</td>
+                <td>${statuses.find(s => s.id === abs.statusId)?.name ?? ''}</td>
             </tr>
         `;
     });
@@ -150,7 +159,7 @@ function renderTableEmployeeStatistics(data) {
 window.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('filterValue');
     const select = document.getElementById('filter');
-    if (input) {
+    if (input && select) {
         input.addEventListener('input', async function () {
             const data = await filterService.filterEmployees(
                 select.value,
@@ -162,13 +171,17 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const dateInput = document.getElementById('statisticsDate');
     const employeeId = document.getElementById('employeeId').value;
-    if (dateInput) {
+    if (dateInput && employeeId) {
         dateInput.addEventListener('change', async function () {
             const data = await filterService.filterStatistics(
                 dateInput.value,
                 employeeId
             );
             renderTableEmployeeStatistics(data);
+        });
+
+        dateInput.addEventListener('click', () => {
+           dateInput.showPicker();
         });
     }
 });
