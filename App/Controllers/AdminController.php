@@ -13,6 +13,7 @@ use Framework\Core\BaseController;
 use Framework\Http\HttpException;
 use Framework\Http\Request;
 use Framework\Http\Responses\Response;
+use const Grpc\STATUS_ABORTED;
 
 /**
  * Class AdminController
@@ -89,7 +90,9 @@ class AdminController extends BaseController
                     'employee' => Employee::getOne($id),
                     'attendances' => Attendance::getAll('`employeeId` LIKE ?', [$id]),
                     'absences' => Absence::getAll('`employeeId` LIKE ?', [$id]),
-                    'departments' => Department::getAll()
+                    'departments' => Department::getAll(),
+                    'absenceTypes' => AbsenceType::getAll(),
+                    'statusTypes' => StatusType::getAll()
                 ]
             );
         } catch (\Exception $e) {
@@ -241,7 +244,7 @@ class AdminController extends BaseController
         }
     }
 
-    public function filter(Request $request): Response
+    public function filterEmployees(Request $request): Response
     {
         try {
             $data = $request->json();
@@ -253,7 +256,7 @@ class AdminController extends BaseController
             $filter = $data->filter ?? null;
             $filterValue = $data->filterValue ?? null;
 
-            if (empty($filter) || empty($filterValue)) {
+            if ($filter === null || $filterValue === null || $filterValue === '') {
                 $employees = Employee::getAll();
                 return $this->json(['employees' => $employees,
                     'departments' => Department::getAll()]);
@@ -336,14 +339,47 @@ class AdminController extends BaseController
 
     public function statistics(Request $request): Response
     {
-        $employee = Employee::getOne($request->post('employeeId'));
+        $employee = Employee::getOne($request->value('id'));
         if (is_null($employee)) {
             throw new HttpException(404);
         }
 
         $attendance = Attendance::getAll("`employeeId` = ?", [$employee->getId()]);
         $absence = Absence::getAll("`employeeId` = ?", [$employee->getId()]);
+        $absenceTypes = AbsenceType::getAll();
+        $statusTypes = StatusType::getAll();
 
+        return $this->html(['employee' => $employee, 'attendances' => $attendance, 'absences' => $absence, 'absenceTypes' => $absenceTypes, 'statusTypes' => $statusTypes]);
+    }
 
+    public function filterStatistics(Request $request): Response
+    {
+        try {
+            $data = $request->json();
+            if (!is_object($data)) {
+                return $this->json([]);
+            }
+
+            $date = $data->date ?? null;
+            if ($date === null || $date === '') {
+                return $this->json(['absences' => Absence::getAll("`employeeId` = ?", [$data->employeeId]),
+                                    'attendances' => Attendance::getAll("`employeeId` = ?", [$data->employeeId])]);
+            }
+
+            [$year, $month] = explode('-', $date);
+            return $this->json([
+                'absences' => Absence::getAll(
+                    "`employeeId` = ? AND YEAR(`startDate`) = ? AND MONTH(`startDate`) = ?",
+                    [$data->employeeId, $year, $month]
+                ),
+
+                'attendances' => Attendance::getAll(
+                    "`employeeId` = ? AND YEAR(`checkInTime`) = ? AND MONTH(`checkInTime`) = ?",
+                    [$data->employeeId, $year, $month]
+                )
+            ]);
+        } catch (\Exception $e) {
+            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+        }
     }
 }

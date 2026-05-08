@@ -2,8 +2,8 @@ import { Filter } from "./Filter.js";
 
 const filterService = new Filter();
 
-const input = document.getElementById('filterValue');
-const select = document.getElementById('filter');
+
+const dateInput = document.getElementById('statisticsDate');
 
 function calculateAge(birthDate) {
     const today = new Date();
@@ -19,7 +19,7 @@ function calculateAge(birthDate) {
     return age;
 }
 
-function renderTable(data) {
+function renderTableEmployees(data) {
     const table = document.getElementById('employeesTable');
     const employees = data.employees;
     const departments = data.departments;
@@ -78,10 +78,98 @@ function renderTable(data) {
     });
 }
 
-input.addEventListener('input', async function () {
-    const data = await filterService.filterEmployees(
-        select.value,
-        input.value
-    );
-    renderTable(data);
+function renderTableEmployeeStatistics(data) {
+    const absencesTable = document.getElementById('absencesTable');
+    const attendancesTable = document.getElementById('attendancesTable');
+    const absences = data.absences;
+    const attendances = data.attendances;
+
+    attendancesTable.innerHTML = `
+        <tr>
+            <th>ID</th>
+            <th>Time in</th>
+            <th>Time out</th>
+            <th>Status</th>
+        </tr>
+    `;
+
+    if (!attendances || attendances.length === 0) {
+        attendancesTable.innerHTML += `
+            <tr>
+                <td colspan="4">No attendances.</td>
+            </tr>
+        `;
+        return;
+    }
+
+    attendances.forEach(att => {
+        //${} is template string, it allows for variable values to be printed instead of the variable name
+        attendancesTable.innerHTML += `
+            <tr>
+                <td>${att.id}</td> 
+                <td>${att.checkInTime}</td>
+                <td>${att.checkOutTime}</td>
+                <td>${att.statusId}</td>
+            </tr>
+        `;
+    });
+
+    absencesTable.innerHTML = `
+        <tr>
+            <th>ID</th>
+            <th>Absence type</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Status</th>
+        </tr>
+    `;
+
+    if (!absences || absences.length === 0) {
+        absencesTable.innerHTML += `
+            <tr>
+                <td colspan="11">No absences.</td>
+            </tr>
+        `;
+        return;
+    }
+
+    absences.forEach(abs => {
+        //${} is template string, it allows for variable values to be printed instead of the variable name
+        absencesTable.innerHTML += `
+            <tr>
+                <td>${abs.id}</td> 
+                <td>${abs.absenceTypeId}</td>
+                <td>${abs.startDate}</td>
+                <td>${abs.endDate}</td>
+                <td>${abs.statusId}</td>
+            </tr>
+        `;
+    });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('filterValue');
+    const select = document.getElementById('filter');
+    if (input) {
+        input.addEventListener('input', async function () {
+            const data = await filterService.filterEmployees(
+                select.value,
+                input.value
+            );
+            renderTableEmployees(data);
+        });
+    }
+
+    const dateInput = document.getElementById('statisticsDate');
+    const employeeId = document.getElementById('employeeId').value;
+    if (dateInput) {
+        dateInput.addEventListener('change', async function () {
+            const data = await filterService.filterStatistics(
+                dateInput.value,
+                employeeId
+            );
+            renderTableEmployeeStatistics(data);
+        });
+    }
 });
+

@@ -4,7 +4,8 @@
 /** @var \App\Models\Attendance[] $attendances */
 /** @var \App\Models\Absence[] $absences */
 /** @var \App\Models\Department[] $departments */
-use App\Models\StatusType;
+/** @var \App\Models\AbsenceType[] $absenceTypes */
+/** @var \App\Models\statusType[] $statusTypes */
 ?>
 
 <div class="container">
@@ -77,7 +78,6 @@ use App\Models\StatusType;
         <table>
             <tr>
                 <th>ID</th>
-                <th>Employee ID</th>
                 <th>Time in</th>
                 <th>Time out</th>
                 <th>Status</th>
@@ -86,10 +86,9 @@ use App\Models\StatusType;
             <?php foreach ($attendances as $attendance) { ?>
                 <tr>
                     <td><?= htmlspecialchars($attendance->getId(), ENT_QUOTES);  ?></td>
-                    <td><?= htmlspecialchars($attendance->getEmployeeId(), ENT_QUOTES);  ?></td>
                     <td><?= htmlspecialchars($attendance->getCheckInTime(), ENT_QUOTES);  ?></td>
                     <td><?= htmlspecialchars($attendance->getCheckOutTime(), ENT_QUOTES);  ?></td>
-                    <td><?= htmlspecialchars(StatusType::getOne($attendance->getStatusId())->getName(), ENT_QUOTES);  ?></td>
+                    <td><?= htmlspecialchars($statusTypes[$attendance->getStatusId() - 1]->getName(), ENT_QUOTES);  ?></td>
                     <td>
                         <a href="<?= $link->url('admin.editAttendance', ['id' => $attendance->getId()]) ?>"
                            class="btn btn-sm btn-primary">
@@ -114,7 +113,6 @@ use App\Models\StatusType;
         <table>
             <tr>
                 <th>ID</th>
-                <th>Employee ID</th>
                 <th>Absence type</th>
                 <th>Start</th>
                 <th>End</th>
@@ -124,11 +122,10 @@ use App\Models\StatusType;
             <?php foreach ($absences as $absence) { ?>
                 <tr>
                     <td><?= htmlspecialchars($absence->getId(), ENT_QUOTES);  ?></td>
-                    <td><?= htmlspecialchars($absence->getEmployeeId(), ENT_QUOTES);  ?></td>
-                    <td><?= htmlspecialchars($absence->getAbsenceTypeId(), ENT_QUOTES); ?></td>
+                    <td><?= htmlspecialchars($absenceTypes[$absence->getAbsenceTypeId()]->getName(), ENT_QUOTES); ?></td>
                     <td><?= htmlspecialchars($absence->getStartDate(), ENT_QUOTES);  ?></td>
                     <td><?= htmlspecialchars($absence->getEndDate(), ENT_QUOTES);  ?></td>
-                    <td><?= htmlspecialchars(StatusType::getOne($absence->getStatusId())->getName(), ENT_QUOTES);  ?></td>
+                    <td><?= htmlspecialchars($statusTypes[$absence->getStatusId() - 1]->getName(), ENT_QUOTES);  ?></td>
                     <td>
                         <a href="<?= $link->url('admin.editAbsence', ['id' => $absence->getId()]) ?>"
                            class="btn btn-sm btn-primary">
