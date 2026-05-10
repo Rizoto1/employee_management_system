@@ -20,6 +20,7 @@ function renderTableEmployees(data) {
     const table = document.getElementById('employeesTable');
     const employees = data.employees;
     const departments = data.departments;
+    const statuses = data.statuses;
 
     table.innerHTML = `
         <tr>
@@ -33,6 +34,7 @@ function renderTableEmployees(data) {
             <th>Hire date</th>
             <th>Department</th>
             <th>Position</th>
+            <th>Status</th>
             <th>Action</th>
         </tr>
     `;
@@ -60,6 +62,7 @@ function renderTableEmployees(data) {
                 <td>${emp.hireDate}</td>
                 <td>${departments.find(d => d.id === emp.departmentId)?.name ?? ''}</td>
                 <td>${emp.position}</td>
+                <td>${statuses[emp.id]}</td>
                 <td>
                     <a href="?c=admin&a=statistics&id=${emp.id}" class="btn btn-sm btn-secondary">
                         Statistics

@@ -1,10 +1,14 @@
 <?php
 /** @var \Framework\Support\LinkGenerator $link */
 /** @var \App\Models\Department[] $departments */
+/** @var string $error */
 ?>
 
 <div class="container">
     <form method="post" action="<?= $link->url('admin.addEmployee')?>">
+        <div class="text-center text-danger mb-3">
+            <?= @$error ?>
+        </div>
         <div class="mb-3">
             <label for="firstName" class="form-label">First name</label>
             <input id="firstName" type="text" name="firstName" class="form-control" placeholder="Insert first name here" required />
@@ -23,7 +27,7 @@
         </div>
         <div class="mb-3">
             <label for="phone" class="form-label">Phone number</label>
-            <input id="phone" type="text" name="phone" class="form-control" placeholder="Insert phone number here" required />
+            <input id="phone" type="number" name="phone" class="form-control" placeholder="Insert phone number here" required />
         </div>
         <div class="mb-3">
             <label for="birthDate" class="form-label">Birth date</label>

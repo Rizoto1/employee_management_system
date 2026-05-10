@@ -36,7 +36,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="phone" class="form-label">Phone number</label>
-                    <input id="phone" type="text" name="phone" class="form-control" value="<?= htmlspecialchars($employee->getPhone(), ENT_QUOTES); ?>" required />
+                    <input id="phone" type="number" name="phone" class="form-control" value="<?= htmlspecialchars($employee->getPhone(), ENT_QUOTES); ?>" required />
                 </div>
                 <div class="mb-3">
                     <label for="birthDate" class="form-label">Birth date</label>
@@ -44,7 +44,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="age" class="form-label">Age</label>
-                    <input id="age" type="text" name="age" class="form-control" value="<?= htmlspecialchars($employee->getAge(), ENT_QUOTES); ?>" required />
+                    <input id="age" type="number" name="age" class="form-control" value="<?= htmlspecialchars($employee->getAge(), ENT_QUOTES); ?>" required />
                 </div>
                 <div class="mb-3">
                     <label for="hireDate" class="form-label">Hire date</label>
@@ -122,7 +122,7 @@
             <?php foreach ($absences as $absence) { ?>
                 <tr>
                     <td><?= htmlspecialchars($absence->getId(), ENT_QUOTES);  ?></td>
-                    <td><?= htmlspecialchars($absenceTypes[$absence->getAbsenceTypeId()]->getName(), ENT_QUOTES); ?></td>
+                    <td><?= htmlspecialchars($absenceTypes[$absence->getAbsenceTypeId() - 1]->getName(), ENT_QUOTES); ?></td>
                     <td><?= htmlspecialchars($absence->getStartDate(), ENT_QUOTES);  ?></td>
                     <td><?= htmlspecialchars($absence->getEndDate(), ENT_QUOTES);  ?></td>
                     <td><?= htmlspecialchars($statusTypes[$absence->getStatusId() - 1]->getName(), ENT_QUOTES);  ?></td>

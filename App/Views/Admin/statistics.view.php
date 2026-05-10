@@ -50,7 +50,7 @@
                         <tr>
                             <td><?= htmlspecialchars($attendance->getId(), ENT_QUOTES);  ?></td>
                             <td><?= htmlspecialchars($attendance->getCheckInTime(), ENT_QUOTES);  ?></td>
-                            <td><?= htmlspecialchars($attendance->getCheckOutTime(), ENT_QUOTES);  ?></td>
+                            <td><?= htmlspecialchars($attendance->getCheckOutTime() ?? '-', ENT_QUOTES);  ?></td>
                             <td><?= htmlspecialchars($statusTypes[$attendance->getStatusId() - 1]->getName(), ENT_QUOTES);  ?></td>
                         </tr>
                     <?php } ?>
@@ -76,7 +76,7 @@
                             <td><?= htmlspecialchars($absence->getId(), ENT_QUOTES);  ?></td>
                             <td><?= htmlspecialchars($absenceTypes[$absence->getAbsenceTypeId() - 1]->getName(), ENT_QUOTES); ?></td>
                             <td><?= htmlspecialchars($absence->getStartDate(), ENT_QUOTES);  ?></td>
-                            <td><?= htmlspecialchars($absence->getEndDate(), ENT_QUOTES);  ?></td>
+                            <td><?= htmlspecialchars($absence->getEndDate() ?? '-', ENT_QUOTES);  ?></td>
                             <td><?= htmlspecialchars($statusTypes[$absence->getStatusId() - 1]->getName(), ENT_QUOTES);  ?></td>
                         </tr>
                     <?php } ?>

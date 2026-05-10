@@ -9,8 +9,7 @@ DROP TABLE IF EXISTS statustypes;
 CREATE TABLE departments
 (
     id              INT PRIMARY KEY AUTO_INCREMENT,
-    name            VARCHAR(50) NOT NULL,
-    description      VARCHAR(255) NOT NULL
+    name            VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE employees
@@ -61,8 +60,7 @@ CREATE TABLE attendances
 CREATE TABLE absencetypes
 (
     id              INT PRIMARY KEY AUTO_INCREMENT,
-    name            VARCHAR(50) NOT NULL,
-    description     VARCHAR(255) NOT NULL
+    name            VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE absences

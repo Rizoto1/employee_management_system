@@ -1,6 +1,7 @@
 <?php
 /** @var \Framework\Support\LinkGenerator $link */
 /** @var \App\Models\Employee[] $employees */
+/** @var string[] $statuses */
 ?>
 <div class="container">
     <div class="mb-3">
@@ -29,6 +30,7 @@
                 <th>Hire date</th>
                 <th>Department</th>
                 <th>Position</th>
+                <th>Status</th>
                 <th>Action</th>
             </tr>
             <?php foreach ($employees as $employee) { ?>
@@ -43,7 +45,7 @@
                     <td><?= htmlspecialchars($employee->getHireDate(), ENT_QUOTES);?></td>
                     <td><?= htmlspecialchars($employee->getDepartment() !== null ? $employee->getDepartment()->getName() : '', ENT_QUOTES);?></td>
                     <td><?= htmlspecialchars($employee->getPosition(), ENT_QUOTES);?></td>
-
+                    <td><?= htmlspecialchars($statuses[$employee->getId()], ENT_QUOTES);?></td>
                     <td>
                         <a href="<?= $link->url('statistics', ['id' => $employee->getId()]) ?>"
                            class="btn btn-sm btn-secondary">

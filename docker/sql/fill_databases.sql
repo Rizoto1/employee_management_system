@@ -1,10 +1,10 @@
 -- departments
-INSERT INTO departments (name, description) VALUES
-                                                ('IT', 'IT Department'),
-                                                ('HR', 'Human Resources'),
-                                                ('Finance', 'Finance Department'),
-                                                ('Marketing', 'Marketing Department'),
-                                                ('Operations', 'Operations Department');
+INSERT INTO departments (name) VALUES
+                                                ('IT'),
+                                                ('HR'),
+                                                ('Finance'),
+                                                ('Marketing'),
+                                                ('Operations');
 
 -- employees
 INSERT INTO employees (firstName, lastName, birthDate, address, email, phone, position, departmentId, hireDate) VALUES
@@ -26,10 +26,11 @@ INSERT INTO users (username, password, employeeId) VALUES
                                                        ('ebielikova', '$2y$10$LkvzUYNLpWUPDhPZEveAfOFNz1sGjeJFOBLTTAvnZ71y5/buaWd02', 5);
 
 INSERT INTO statustypes (name) VALUES
-                                   ('present'),
-                                   ('sick'),
-                                   ('home_office'),
-                                   ('vacation');
+                                   ('Absent'),
+                                   ('Present'),
+                                   ('Sick'),
+                                   ('Home office'),
+                                   ('Vacation');
 
 -- attendances
 INSERT INTO attendances (employeeId, checkInTime, checkOutTime, statusId) VALUES
@@ -59,15 +60,15 @@ INSERT INTO attendances (employeeId, checkInTime, checkOutTime, statusId) VALUES
                                                                               (2, '2026-03-07 08:30:00', '2026-03-07 16:30:00', 1),
                                                                               (3, '2026-04-08 09:00:00', '2026-04-08 17:00:00', 1),
                                                                               (4, '2026-05-09 08:00:00', '2026-05-09 15:00:00', 2),
-                                                                              (5, '2026-06-10 07:45:00', '2026-06-10 15:45:00', 1);
+                                                                              (5, '2026-06-10 07:45:00', '2026-06-10 15:45:00', 1),
+                                                                              (2, '2026-05-10 07:45:00', null, 2);
 
 -- absence_types
-INSERT INTO absencetypes (name, description) VALUES
-                                                  ('Sick Leave', 'Illness'),
-                                                  ('Vacation', 'Paid vacation'),
-                                                  ('Home Office', 'Work from home'),
-                                                  ('Unpaid Leave', 'Unpaid leave'),
-                                                  ('Business Trip', 'Work travel');
+INSERT INTO absencetypes (name) VALUES
+                                                  ('Sick leave'),
+                                                  ('Vacation'),
+                                                  ('Unpaid leave'),
+                                                  ('Business trip');
 
 -- absences
 INSERT INTO absences (employeeId, absenceTypeId, startDate, endDate, statusId) VALUES
@@ -75,25 +76,27 @@ INSERT INTO absences (employeeId, absenceTypeId, startDate, endDate, statusId) V
 (1, 1, '2024-01-15', '2024-01-18', 2),
 (2, 2, '2024-02-20', '2024-02-25', 4),
 (3, 3, '2024-03-05', '2024-03-05', 3),
-(4, 5, '2024-04-10', '2024-04-14', 1),
+(4, 1, '2024-04-10', '2024-04-14', 1),
 (5, 4, '2024-05-01', '2024-05-03', 2),
 
 -- 2025
 (1, 2, '2025-01-10', '2025-01-15', 4),
 (1, 1, '2025-03-01', '2025-03-04', 2),
 (2, 3, '2025-04-12', '2025-04-12', 3),
-(2, 5, '2025-05-20', '2025-05-24', 1),
+(2, 2, '2025-05-20', '2025-05-24', 1),
 (3, 1, '2025-06-02', '2025-06-06', 2),
 (3, 2, '2025-07-15', '2025-07-20', 4),
 (4, 4, '2025-08-01', '2025-08-03', 2),
 (4, 3, '2025-09-09', '2025-09-09', 3),
-(5, 5, '2025-10-11', '2025-10-14', 1),
+(5, 3, '2025-10-11', '2025-10-14', 1),
 (5, 2, '2025-11-20', '2025-11-25', 4),
 
 -- 2026
 (1, 1, '2026-01-12', '2026-01-14', 2),
+(1, 1, '2026-05-08', null, 5),
+(1, 1, '2026-01-12', '2026-01-14', 2),
 (2, 2, '2026-02-18', '2026-02-22', 4),
 (3, 3, '2026-03-10', '2026-03-10', 3),
 (4, 4, '2026-04-01', '2026-04-05', 2),
-(5, 5, '2026-05-16', '2026-05-20', 1);
+(5, 1, '2026-05-16', '2026-05-20', 1);
 
