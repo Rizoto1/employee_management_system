@@ -1,6 +1,7 @@
 <?php
 /** @var \Framework\Support\LinkGenerator $link */
 /** @var \App\Models\Employee $employee */
+/** @var \App\Models\User $employeeUser */
 /** @var \App\Models\Attendance[] $attendances */
 /** @var \App\Models\Absence[] $absences */
 /** @var \App\Models\Department[] $departments */
@@ -14,7 +15,7 @@
     <div class="card mb-3">
         <div class="card-body">
             <form method="post" action="<?= $link->url('admin.updateEmployee') ?>">
-                <div class="mb-3">
+                <div style="display: none" class="mb-3">
                     <label for="id" class="form-label">Id</label>
                     <input id="id" type="text" name="id" class="form-control" value="<?= htmlspecialchars($employee->getId(), ENT_QUOTES); ?>" readonly />
                 </div>
@@ -73,6 +74,33 @@
         </div>
     </div>
 
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="post" action="<?= $link->url('admin.updateUser') ?>">
+                <div class="mb-3" style="display: none">
+                    <label for="id" class="form-label">Id</label>
+                    <input id="id" type="text" name="id" class="form-control" value="<?= htmlspecialchars($employeeUser->getId(), ENT_QUOTES); ?>" readonly />
+                </div>
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input id="username" type="text" name="username" class="form-control" value="<?= htmlspecialchars($employeeUser->getName(), ENT_QUOTES); ?>" required />
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input id="password" type="password" name="password" class="form-control"/>
+                </div>
+                <div class="mb-3">
+                    <label for="passwordCheck" class="form-label">Password check</label>
+                    <input id="passwordCheck" type="password" name="passwordCheck" class="form-control"/>
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a href="<?= $link->url('admin.show') ?>" class="btn btn-secondary">
+                    Back
+                </a>
+            </form>
+        </div>
+    </div>
+
     <h2>Attendances</h2>
     <?php if (!empty($attendances)) { ?>
         <table>
@@ -87,7 +115,7 @@
                 <tr>
                     <td><?= htmlspecialchars($attendance->getId(), ENT_QUOTES);  ?></td>
                     <td><?= htmlspecialchars($attendance->getCheckInTime(), ENT_QUOTES);  ?></td>
-                    <td><?= htmlspecialchars($attendance->getCheckOutTime(), ENT_QUOTES);  ?></td>
+                    <td><?= htmlspecialchars($attendance->getCheckOutTime() ?? '-', ENT_QUOTES);  ?></td>
                     <td><?= htmlspecialchars($statusTypes[$attendance->getStatusId() - 1]->getName(), ENT_QUOTES);  ?></td>
                     <td>
                         <a href="<?= $link->url('admin.editAttendance', ['id' => $attendance->getId()]) ?>"
@@ -116,7 +144,6 @@
                 <th>Absence type</th>
                 <th>Start</th>
                 <th>End</th>
-                <th>Status</th>
                 <th>Actions</th>
             </tr>
             <?php foreach ($absences as $absence) { ?>
@@ -124,8 +151,7 @@
                     <td><?= htmlspecialchars($absence->getId(), ENT_QUOTES);  ?></td>
                     <td><?= htmlspecialchars($absenceTypes[$absence->getAbsenceTypeId() - 1]->getName(), ENT_QUOTES); ?></td>
                     <td><?= htmlspecialchars($absence->getStartDate(), ENT_QUOTES);  ?></td>
-                    <td><?= htmlspecialchars($absence->getEndDate(), ENT_QUOTES);  ?></td>
-                    <td><?= htmlspecialchars($statusTypes[$absence->getStatusId() - 1]->getName(), ENT_QUOTES);  ?></td>
+                    <td><?= htmlspecialchars($absence->getEndDate()  ?? '-', ENT_QUOTES);  ?></td>
                     <td>
                         <a href="<?= $link->url('admin.editAbsence', ['id' => $absence->getId()]) ?>"
                            class="btn btn-sm btn-primary">

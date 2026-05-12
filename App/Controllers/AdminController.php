@@ -52,7 +52,6 @@ class AdminController extends BaseController
         return $this->html();
     }
 
-    //todo: cehck phone is number, email is valid, dates are dates, do the same for edits
     public function addEmployee(Request $request): Response
     {
         if (!$request->isPost()) {
@@ -93,6 +92,7 @@ class AdminController extends BaseController
     {
         try {
             $id = $request->value('id');
+            $user = User::getAll('`employeeId` LIKE ?', [$id])[0];
 
             return $this->html(
                 [
@@ -101,7 +101,8 @@ class AdminController extends BaseController
                     'absences' => Absence::getAll('`employeeId` LIKE ?', [$id]),
                     'departments' => Department::getAll(),
                     'absenceTypes' => AbsenceType::getAll(),
-                    'statusTypes' => StatusType::getAll()
+                    'statusTypes' => StatusType::getAll(),
+                    'employeeUser' => $user
                 ]
             );
         } catch (\Exception $e) {
@@ -154,7 +155,43 @@ class AdminController extends BaseController
         return $this->redirect($this->url("admin.show"));
     }
 
-    //todo: show employee status where status means if employee is currently at work, on sick leave, on vacation, etc. based on latest attendance and absence
+    public function updateUser(Request $request): Response
+    {
+        if (!$request->isPost()) {
+            $user = User::getOne((int)$request->post('id'));
+            return $this->redirect($this->url("admin.editEmployee", ['id' => $user->getEmployeeId()]));
+        }
+
+        try {
+            $id = (int)$request->post('id');
+
+            $user = User::getOne($id);
+            if (is_null($user)) {
+                throw new HttpException(404);
+            }
+
+            foreach($request->post() as $value) {
+                if ($this->specialChars($value)) {
+                    return $this->redirect($this->url("admin.editEmployee",
+                        ['error' => 'Input cannot contain special characters.',
+                            'id' => $user->getEmployeeId()
+                        ]));
+                }
+            }
+
+            $user->setUsername($request->post('username'));
+            $password = $request->post('password');
+            if (!empty($password)) {
+                $user->setPassword($request->post('password'));
+            }
+            $user->save();
+
+            return $this->redirect($this->url("admin.editEmployee", ['id' => $user->getEmployeeId()]));
+        } catch (\Exception $e) {
+            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+        }
+    }
+
     public function show(Request $request): Response
     {
         try {
@@ -341,10 +378,8 @@ class AdminController extends BaseController
                 throw new HttpException(404);
             }
 
-
             $absence->setStartDate($request->post('startDate'));
             $absence->setEndDate($request->post('endDate'));
-            $absence->setStatusId($request->post('statusId'));
             $absence->setAbsenceTypeId($request->post('absenceId'));
             $absence->save();
 
@@ -490,7 +525,7 @@ class AdminController extends BaseController
         $status = 'Absent';
 
         if ($latestAbsence && !$latestAbsence->getEndDate()) {
-            $status = StatusType::getOne($latestAbsence->getStatusId())->getName();
+            $status = AbsenceType::getOne($latestAbsence->getAbsenceTypeId())->getName();
         } else if ($latestAttendance && !$latestAttendance->getCheckOutTime()) {
             $status = StatusType::getOne($latestAttendance->getStatusId())->getName();
         }

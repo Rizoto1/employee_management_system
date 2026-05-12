@@ -40,12 +40,21 @@
                 <a href="<?= $link->url("employee.index")?>">
                     <button type="button" class="btn btn-primary m-2">Home</button>
                 </a>
-
-                <button type="button" class="btn btn-primary m-2">Home</button>
-                <button type="button" class="btn btn-primary m-2">Home</button>
-                <button type="button" class="btn btn-primary m-2">Home</button>
-                <button type="button" class="btn btn-primary m-2">Home</button>
-                <button type="button" class="btn btn-primary m-2">Home</button>
+                <a href="<?= $link->url("employee.addAbsence", ['name' => $user->getName()])?>">
+                    <button type="button" class="btn btn-primary m-2">Add absence</button>
+                </a>
+                <a href="<?= $link->url("employee.showAbsences", ['name' => $user->getName()])?>">
+                    <button type="button" class="btn btn-primary m-2">Show absences</button>
+                </a>
+                <a href="<?= $link->url("employee.addAttendance", ['name' => $user->getName()])?>">
+                    <button type="button" class="btn btn-primary m-2">Add attendance</button>
+                </a>
+                <a href="<?= $link->url("employee.showAttendances", ['name' => $user->getName()])?>">
+                    <button type="button" class="btn btn-primary m-2">Show attendances</button>
+                </a>
+                <a href="<?= $link->url("employee.editUser", ['name' => $user->getName()])?>">
+                    <button type="button" class="btn btn-primary m-2">Edit profile</button>
+                </a>
             <?php } ?>
 
         </div>

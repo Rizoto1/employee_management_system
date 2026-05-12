@@ -70,10 +70,8 @@ CREATE TABLE absences
     absenceTypeId   INT NOT NULL,
     startDate       DATE NOT NULL,
     endDate         DATE NULL,
-    statusId        INT NOT NULL,
 
     CHECK (endDate >= startDate),
     FOREIGN KEY (employeeId) REFERENCES employees(id),
-    FOREIGN KEY (absenceTypeId) REFERENCES absencetypes(id),
-    FOREIGN KEY (statusId) REFERENCES statustypes(id)
+    FOREIGN KEY (absenceTypeId) REFERENCES absencetypes(id)
 );

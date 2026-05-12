@@ -132,7 +132,6 @@ function renderTableEmployeeStatistics(data) {
             <th>Absence type</th>
             <th>Start</th>
             <th>End</th>
-            <th>Status</th>
         </tr>
     `;
 
@@ -153,7 +152,6 @@ function renderTableEmployeeStatistics(data) {
                 <td>${absenceTypes.find(a => a.id === abs.absenceTypeId)?.name ?? ''}</td>
                 <td>${abs.startDate}</td>
                 <td>${abs.endDate}</td>
-                <td>${statuses.find(s => s.id === abs.statusId)?.name ?? ''}</td>
             </tr>
         `;
     });

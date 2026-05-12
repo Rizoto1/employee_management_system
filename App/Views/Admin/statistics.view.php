@@ -68,7 +68,6 @@
                     <th>Absence type</th>
                     <th>Start</th>
                     <th>End</th>
-                    <th>Status</th>
                 </tr>
                 <?php if (!empty($absences)) { ?>
                     <?php foreach ($absences as $absence) { ?>
@@ -77,7 +76,6 @@
                             <td><?= htmlspecialchars($absenceTypes[$absence->getAbsenceTypeId() - 1]->getName(), ENT_QUOTES); ?></td>
                             <td><?= htmlspecialchars($absence->getStartDate(), ENT_QUOTES);  ?></td>
                             <td><?= htmlspecialchars($absence->getEndDate() ?? '-', ENT_QUOTES);  ?></td>
-                            <td><?= htmlspecialchars($statusTypes[$absence->getStatusId() - 1]->getName(), ENT_QUOTES);  ?></td>
                         </tr>
                     <?php } ?>
                 <?php } else { ?>

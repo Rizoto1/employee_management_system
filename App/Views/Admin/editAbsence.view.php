@@ -26,18 +26,7 @@
 
                     <div class="mb-3">
                         <label for="endDate" class="form-label">End date</label>
-                        <input id="endDate" type="date" name="endDate" class="form-control" value="<?= htmlspecialchars($absence->getEndDate(), ENT_QUOTES); ?>" required onfocus="this.showPicker()" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="statusId" class="form-label">Status: </label>
-                        <select name="statusId" id="statusId">
-                            <?php foreach ($statusTypes as $statusType) { ?>
-                                <option value="<?= htmlspecialchars($statusType->getId(), ENT_QUOTES); ?>" <?= $absence->getStatusId() === $statusType->getId() ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($statusType->getName(), ENT_QUOTES); ?>
-                                </option>
-                            <?php } ?>
-                        </select>
+                        <input id="endDate" type="date" name="endDate" class="form-control" value="<?= htmlspecialchars($absence->getEndDate() ?? '', ENT_QUOTES); ?>" required onfocus="this.showPicker()" />
                     </div>
 
                     <div class="mb-3">

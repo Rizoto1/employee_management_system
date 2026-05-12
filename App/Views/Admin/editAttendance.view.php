@@ -25,7 +25,7 @@
 
                     <div class="mb-3">
                         <label for="checkOutTime" class="form-label">Check out time</label>
-                        <input id="checkOutTime" type="datetime-local" name="checkOutTime" class="form-control" value="<?= htmlspecialchars($attendance->getCheckOutTime(), ENT_QUOTES); ?>" required onfocus="this.showPicker()" />
+                        <input id="checkOutTime" type="datetime-local" name="checkOutTime" class="form-control" value="<?= htmlspecialchars($attendance->getCheckOutTime()  ?? '', ENT_QUOTES); ?>" required onfocus="this.showPicker()" />
                     </div>
 
                     <div class="mb-3">

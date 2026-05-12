@@ -11,7 +11,6 @@ class Absence extends Model
     protected int $absenceTypeId;
     protected string $startDate;
     protected ?string $endDate;
-    protected int $statusId;
 
     public function getId(): ?int
     {
@@ -38,11 +37,6 @@ class Absence extends Model
         return $this->endDate;
     }
 
-    public function getStatusId(): int
-    {
-        return $this->statusId;
-    }
-
     public function setId(int $id): void
     {
         $this->id = $id;
@@ -66,10 +60,5 @@ class Absence extends Model
     public function setEndDate(string $endDate): void
     {
         $this->endDate = $endDate;
-    }
-
-    public function setStatusId(int $statusId): void
-    {
-        $this->statusId = $statusId;
     }
 }
