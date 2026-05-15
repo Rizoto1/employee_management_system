@@ -1,7 +1,86 @@
 .navbar {
-    border-bottom: 1px solid grey;
+    background-color: cornsilk;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 16.66666667%; /* col-lg-2 */
+    height: 100vh;
+}
+
+@media (max-width: 767px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+    }
+}
+
+.main-content {
+    margin-left: 16.66666667%;
+}
+
+.topbar {
+    position: sticky;
+    top: 0;
 }
 
 .navbar-brand img {
     width: 50px;
+}
+
+table {
+    background-color: cornsilk;
+    width: 100%;
+    border-width: 2px;
+    border-color: antiquewhite;
+    border-style: solid;
+}
+
+table th {
+    background-color: beige;
+    padding: 10px;
+    border-bottom: 2px solid antiquewhite;
+}
+
+table td {
+    border-bottom: 1px solid antiquewhite;
+}
+
+table td:last-child {
+    padding: 10px;
+    white-space: nowrap; /* Prevents the buttons from wrapping to the next line */
+}
+
+.btn-danger {
+    background-color: orangered;
+    border-color: antiquewhite;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background-color: lightseagreen;
+    border-color: antiquewhite;
+    font-weight: bold;
+}
+
+.btn-secondary {
+    background-color: cornflowerblue;
+    border-color: antiquewhite;
+    font-weight: bold;
+}
+
+input[type="text"], input[type="number"], input[type="date"], input[type="month"], input[type="datetime-local"], select {
+    background-color: cornsilk;
+    border: 2px solid antiquewhite;
+}
+
+input[type="text"]:focus, input[type="number"]:focus , input[type="date"]:focus, input[type="month"]:focus, input[type="datetime-local"]:focus {
+    background-color: cornsilk;
 }

@@ -14,15 +14,15 @@
         <?php } ?>
         <div style="display: none">
             <label for="name" class="form-label">Name</label>
-            <input id="name" type="text" name="name" class="form-control" value="<?= $user->getName() ?>" required/>
+            <input id="name" type="text" name="name" class="form-control" value="<?= $user->getName() ?>" required readonly/>
         </div>
         <div class="mb-3">
             <label for="startDate" class="form-label">Start date</label>
-            <input id="startDate" type="date" name="startDate" class="form-control" required onfocus="this.showPicker()" />
+            <input id="startDate" type="date" name="startDate" class="form-control" required" />
         </div>
         <div class="mb-3">
             <label for="endDate" class="form-label">End date</label>
-            <input id="endDate" type="date" name="endDate" class="form-control" onfocus="this.showPicker()" />
+            <input id="endDate" type="date" name="endDate" class="form-control"" />
         </div>
         <div class="mb-3">
             <label for="absenceTypeId" class="form-label">Absence type: </label>

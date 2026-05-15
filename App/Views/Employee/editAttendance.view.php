@@ -17,7 +17,7 @@
                 <div class="mb-3">
                     <div class="mb-3" style="display: none">
                         <label for="id" class="form-label">Id</label>
-                        <input id="id" type="text" name="id" class="form-control" value="<?= htmlspecialchars($attendance->getId(), ENT_QUOTES); ?>" readonly />
+                        <input id="id" type="text" name="id" class="form-control" value="<?= htmlspecialchars($attendance->getId(), ENT_QUOTES); ?>" readonly required />
                     </div>
 
                     <?php if(!is_null(@$error)) {?>
@@ -34,7 +34,7 @@
 
                     <div class="mb-3">
                         <label for="checkOutTime" class="form-label">Check out time</label>
-                        <input id="checkOutTime" type="datetime-local" name="checkOutTime" class="form-control" value="" required onfocus="this.showPicker()" />
+                        <input id="checkOutTime" type="datetime-local" name="checkOutTime" class="form-control" required" />
                     </div>
 
                     <div class="mb-3">

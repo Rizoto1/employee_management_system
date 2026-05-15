@@ -2,8 +2,8 @@ import {DataService} from "./DataService.js";
 
 class Filter extends DataService {
 
-    constructor() {
-        super("admin");
+    constructor(controller) {
+        super(controller);
     }
 
     async filterEmployees(filter, filterValue) {

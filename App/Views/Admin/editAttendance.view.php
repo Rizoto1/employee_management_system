@@ -3,6 +3,7 @@
 /** @var \App\Models\Employee $employee */
 /** @var \App\Models\Attendance $attendance */
 /** @var \App\Models\StatusType[] $statusTypes */
+/** @var string|null $error */
 ?>
 
 <div class="container">
@@ -11,21 +12,26 @@
     <div class="card mb-3">
         <div class="card-body">
             <h5 class="card-title"><?= htmlspecialchars($employee->getFirstName() . ' ' . $employee->getLastName(), ENT_QUOTES); ?></h5>
+            <?php if(!is_null(@$error)) {?>
+                <div class="text-center text-danger mb-3">
+                    <?= @$error ?>
+                </div>
+            <?php } ?>
             <form method="post" action="<?= $link->url('admin.updateAttendance')?>">
                 <div class="mb-3">
-                    <div class="mb-3">
+                    <div class="mb-3" style="display: none">
                         <label for="id" class="form-label">Id</label>
-                        <input id="id" type="text" name="id" class="form-control" value="<?= htmlspecialchars($attendance->getId(), ENT_QUOTES); ?>" readonly />
+                        <input id="id" type="text" name="id" class="form-control" value="<?= htmlspecialchars($attendance->getId(), ENT_QUOTES); ?>" readonly required />
                     </div>
 
                     <div class="mb-3">
                         <label for="checkInTime" class="form-label">Check in time</label>
-                        <input id="checkInTime" type="datetime-local" name="checkInTime" class="form-control" value="<?= htmlspecialchars($attendance->getCheckInTime(), ENT_QUOTES); ?>" required onfocus="this.showPicker()" />
+                        <input id="checkInTime" type="datetime-local" name="checkInTime" class="form-control" value="<?= htmlspecialchars($attendance->getCheckInTime(), ENT_QUOTES); ?>" required" />
                     </div>
 
                     <div class="mb-3">
                         <label for="checkOutTime" class="form-label">Check out time</label>
-                        <input id="checkOutTime" type="datetime-local" name="checkOutTime" class="form-control" value="<?= htmlspecialchars($attendance->getCheckOutTime()  ?? '', ENT_QUOTES); ?>" required onfocus="this.showPicker()" />
+                        <input id="checkOutTime" type="datetime-local" name="checkOutTime" class="form-control" value="<?= htmlspecialchars($attendance->getCheckOutTime()  ?? '', ENT_QUOTES); ?>" required" />
                     </div>
 
                     <div class="mb-3">

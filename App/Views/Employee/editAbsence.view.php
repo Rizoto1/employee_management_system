@@ -17,7 +17,7 @@
                 <div class="mb-3">
                     <div class="mb-3" style="display: none">
                         <label for="id" class="form-label">Id</label>
-                        <input id="id" type="text" name="id" class="form-control" value="<?= htmlspecialchars($absence->getId(), ENT_QUOTES); ?>" readonly />
+                        <input id="id" type="text" name="id" class="form-control" value="<?= htmlspecialchars($absence->getId(), ENT_QUOTES); ?>" required readonly />
                     </div>
 
                     <?php if(!is_null(@$error)) {?>
@@ -34,7 +34,7 @@
 
                     <div class="mb-3">
                         <label for="endDate" class="form-label">End date</label>
-                        <input id="endDate" type="date" name="endDate" class="form-control" value="<?= htmlspecialchars($absence->getEndDate() ?? '', ENT_QUOTES); ?>" required onfocus="this.showPicker()" />
+                        <input id="endDate" type="date" name="endDate" class="form-control" value="<?= htmlspecialchars($absence->getEndDate() ?? '', ENT_QUOTES); ?>" required" />
                     </div>
 
                     <div class="mb-3">

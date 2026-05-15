@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS statustypes;
 CREATE TABLE departments
 (
     id              INT PRIMARY KEY AUTO_INCREMENT,
-    name            VARCHAR(50) NOT NULL
+    name            VARCHAR(50) UNIQUE NOT NULL
 );
 
 CREATE TABLE employees

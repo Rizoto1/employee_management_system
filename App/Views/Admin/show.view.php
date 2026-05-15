@@ -1,6 +1,8 @@
 <?php
 /** @var \Framework\Support\LinkGenerator $link */
 /** @var \App\Models\Employee[] $employees */
+/** @var integer $currentPage */
+/** @var integer $totalPages */
 /** @var string[] $statuses */
 ?>
 <div class="container">
@@ -70,6 +72,17 @@
     <?php } else { ?>
         <h1> No employees.</h1>
     <?php } ?>
+
+    <div id="pagination" class="mb-3"></div>
+
+    <div class="mb-3" id="paginationSecond">
+        <?php for ($i = 1; $i <= $totalPages; $i++) { ?>
+            <a href="<?= $link->url('admin.show', ['page' => $i]) ?>"
+               class="btn btn-sm <?= $i == $currentPage ? 'btn-primary' : 'btn-secondary' ?>">
+                <?= $i ?>
+            </a>
+        <?php } ?>
+    </div>
 </div>
 
 

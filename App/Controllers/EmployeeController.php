@@ -43,9 +43,25 @@ class EmployeeController extends BaseController
 
         $user = $users[0];
         $employeeId = $user->getEmployeeId();
+        $employee = Employee::getOne($employeeId);
 
-        $absences = Absence::getAll('`employeeId` = ?', [$employeeId], 'startDate DESC');
-        return $this->html(['absences' => $absences, 'absenceTypes' => $absenceTypes]);
+        $date = date('Y-m');
+        [$year, $month] = explode('-', $date);
+        $absence = Absence::getAll("`employeeId` = ? AND YEAR(`startDate`) = ? AND MONTH(`startDate`) = ?",
+            [$employee->getId(), $year, $month], 'startDate DESC');
+        $absenceDays = 0;
+
+        foreach ($absence as $a) {
+            $start = new \DateTime($a->getStartDate());
+            if ($a->getEndDate() === null) {
+                $end = new \DateTime();
+            } else {
+                $end = new \DateTime($a->getEndDate());
+            }
+            $absenceDays += $start->diff($end)->days + 1;
+        }
+
+        return $this->html(['absences' => $absences, 'absenceTypes' => $absenceTypes, 'employee' => $employee, 'absenceDays' => $absenceDays]);
     }
 
     public function showAttendances(Request $request): Response
@@ -64,9 +80,25 @@ class EmployeeController extends BaseController
 
         $user = $users[0];
         $employeeId = $user->getEmployeeId();
+        $employee = Employee::getOne($employeeId);
 
-        $attendances = Attendance::getAll('`employeeId` = ?', [$employeeId], 'checkInTime DESC');
-        return $this->html(['attendances' => $attendances, 'statusTypes' => $statusTypes]);
+        $date = date('Y-m');
+        [$year, $month] = explode('-', $date);
+        $attendance = Attendance::getAll("`employeeId` = ? AND YEAR(`checkInTime`) = ? AND MONTH(`checkInTime`) = ?",
+            [$employee->getId(), $year, $month]);
+
+        $attendanceDays = 0;
+        $attendanceHours = 0;
+        foreach ($attendance as $a) {
+            if ($a->getCheckOutTime() !== null) {
+                $start = new \DateTime($a->getCheckInTime());
+                $end = new \DateTime($a->getCheckOutTime());
+                $attendanceHours += ($end->getTimestamp() - $start->getTimestamp()) / 3600;
+                $attendanceDays += 1;
+            }
+        }
+
+        return $this->html(['attendances' => $attendance, 'statusTypes' => $statusTypes, 'employee' => $employee, 'attendanceDays' => $attendanceDays, 'attendanceHours' => $attendanceHours]);
     }
 
     public function addAbsence(Request $request): Response
@@ -89,8 +121,13 @@ class EmployeeController extends BaseController
 
             $user = $users[0];
             $employeeId = $user->getEmployeeId();
+            $values = $request->post();
+            $valuesCount = count($values);
+            if ($valuesCount < 4) {
+                return $this->html(['error' => "Please fill in all required fields!", 'absenceTypes' => $absenceTypes]);
+            }
 
-            foreach($request->post() as $value) {
+            foreach($values as $value) {
                 if ($this->specialChars($value)) {
                     return $this->html(['error' => "Invalid input: special characters are not allowed.", 'absenceTypes' => $absenceTypes]);
                 }
@@ -101,6 +138,11 @@ class EmployeeController extends BaseController
             $absence->setAbsenceTypeId((int)$request->post('absenceTypeId'));
             $absence->setStartDate($request->post('startDate'));
             if ($request->post('endDate')) {
+                $endDate = new \DateTime($request->post('endDate'));
+                $startDate = new \DateTime($request->post('startDate'));
+                if ($endDate < $startDate) {
+                    return $this->html(['error' => "End date cannot be earlier than start date.", 'absenceTypes' => $absenceTypes]);
+                }
                 $absence->setEndDate($request->post('endDate'));
             }
             $absence->save();
@@ -342,7 +384,64 @@ class EmployeeController extends BaseController
         }
     }
 
+    public function filterStatistics(Request $request): Response
+    {
+        try {
+            $data = $request->json();
+            if (!is_object($data)) {
+                return $this->json([]);
+            }
+
+            $date = $data->date ?? null;
+            if ($date === null || $date === '') {
+                return $this->json(['absences' => Absence::getAll("`employeeId` = ?", [$data->employeeId]),
+                    'attendances' => Attendance::getAll("`employeeId` = ?", [$data->employeeId])]);
+            }
+
+            [$year, $month] = explode('-', $date);
+            $absence = Absence::getAll("`employeeId` = ? AND YEAR(`startDate`) = ? AND MONTH(`startDate`) = ?",
+                [$data->employeeId, $year, $month]);
+            $attendance = Attendance::getAll("`employeeId` = ? AND YEAR(`checkInTime`) = ? AND MONTH(`checkInTime`) = ?",
+                [$data->employeeId, $year, $month]);
+
+            $absenceDays = 0;
+            $attendanceDays = 0;
+            $attendanceHours = 0;
+
+            foreach ($absence as $a) {
+                $start = new \DateTime($a->getStartDate());
+                if ($a->getEndDate() === null) {
+                    $end = new \DateTime();
+                } else {
+                    $end = new \DateTime($a->getEndDate());
+                }
+                $absenceDays += $start->diff($end)->days + 1;
+            }
+
+            foreach ($attendance as $a) {
+                if ($a->getCheckOutTime() !== null) {
+                    $start = new \DateTime($a->getCheckInTime());
+                    $end = new \DateTime($a->getCheckOutTime());
+                    $attendanceHours += ($end->getTimestamp() - $start->getTimestamp()) / 3600;
+                    $attendanceDays += 1;
+                }
+            }
+
+            return $this->json([
+                'absences' => $absence,
+                'attendances' => $attendance,
+                'attendanceDays' => $attendanceDays,
+                'attendanceHours' => $attendanceHours,
+                'absenceDays' => $absenceDays,
+                'absenceTypes' => AbsenceType::getAll(),
+                'statusTypes' => StatusType::getAll()
+            ]);
+        } catch (\Exception $e) {
+            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+        }
+    }
+
     private function specialChars($str) {
-        return preg_match('/[^a-zA-Z0-9]/', $str) > 0;
+        return preg_match('/[^a-zA-Z0-9@.,\-]/', $str) > 0;
     }
 }

@@ -13,11 +13,11 @@
         </div>
         <div style="display: none">
             <label for="name" class="form-label">Name</label>
-            <input id="name" type="text" name="name" class="form-control" value="<?= $user->getName() ?>" required/>
+            <input id="name" type="text" name="name" class="form-control" value="<?= $user->getName() ?>" required readonly/>
         </div>
         <div class="mb-3">
             <label for="checkInTime" class="form-label">Check in time</label>
-            <input id="checkInTime" type="datetime-local" name="checkInTime" class="form-control" required onfocus="this.showPicker()" />
+            <input id="checkInTime" type="datetime-local" name="checkInTime" class="form-control" required" />
         </div>
         <div class="mb-3">
             <label for="statusTypeId" class="form-label">Status type: </label>

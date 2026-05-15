@@ -3,6 +3,9 @@
 /** @var \App\Models\Attendance[] $attendances */
 /** @var \App\Models\StatusType[] $statusTypes */
 /** @var string $error */
+/** @var \App\Models\Employee $employee */
+/** @var $attendanceDays */
+/** @var $attendanceHours */
 ?>
 
 <div class="container">
@@ -10,8 +13,32 @@
     <div class="text-center text-danger mb-3">
         <?= @$error ?>
     </div>
+
+    <div>
+        <input type="hidden" id="employeeId" value="<?= htmlspecialchars($employee->getId(), ENT_QUOTES); ?>">
+    </div>
+
+    <div class="mb-3">
+        <label for="statisticsDateEmp" class="form-label">Filter by date</label>
+        <input id="statisticsDateEmp" type="month" name="statisticsDateEmp" class="form-control" value="<?= htmlspecialchars(date('Y-m'), ENT_QUOTES); ?>" required />
+    </div>
+
+    <div class="mb-3">
+        <table id="statisticsTable">
+            <tr>
+                <th>Total days worked</th>
+                <th>Total hours worked</th>
+                <th>Total absences</th>
+            </tr>
+            <tr>
+                <td id="attendanceDays"><?= htmlspecialchars($attendanceDays, ENT_QUOTES)?></td>
+                <td id="attendanceHours"><?= htmlspecialchars($attendanceHours, ENT_QUOTES)?></td>
+            </tr>
+        </table>
+    </div>
+
+    <table id="attendancesTable">
     <?php if (!empty($attendances)) { ?>
-        <table>
             <tr>
                 <th>ID</th>
                 <th>Status type</th>
@@ -35,9 +62,12 @@
                     <?php } ?>
                 </tr>
             <?php } ?>
-        </table>
+
     <?php } else { ?>
-        <h3>No absences.</h3>
+        <tr>
+            <th rowspan="5">No absences.</th>
+        </tr>
     <?php } ?>
+    </table>
 </div>
 

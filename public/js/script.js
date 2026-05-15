@@ -1,6 +1,8 @@
 import { Filter } from "./Filter.js";
 
-const filterService = new Filter();
+const adminFilter = new Filter("admin");
+const employeeFilter = new Filter("employee");
+let currentPage = 1;
 
 function calculateAge(birthDate) {
     const today = new Date();
@@ -16,11 +18,17 @@ function calculateAge(birthDate) {
     return age;
 }
 
-function renderTableEmployees(data) {
+function renderTableEmployees(data, page = 1) {
+    const perPage = 20;
     const table = document.getElementById('employeesTable');
     const employees = data.employees;
     const departments = data.departments;
     const statuses = data.statuses;
+
+    currentPage = page;
+    const start = (page - 1) * perPage;
+    const end = start + perPage;
+    const paginatedEmployees = employees.slice(start, end);
 
     table.innerHTML = `
         <tr>
@@ -39,7 +47,7 @@ function renderTableEmployees(data) {
         </tr>
     `;
 
-    if (!employees || employees.length === 0) {
+    if (!paginatedEmployees || paginatedEmployees.length === 0) {
         table.innerHTML += `
             <tr>
                 <td colspan="11">No employees.</td>
@@ -48,7 +56,7 @@ function renderTableEmployees(data) {
         return;
     }
 
-    employees.forEach(emp => {
+    paginatedEmployees.forEach(emp => {
         //${} is template string, it allows for variable values to be printed instead of the variable name
         table.innerHTML += `
             <tr>
@@ -79,6 +87,32 @@ function renderTableEmployees(data) {
             </tr>
         `;
     });
+
+    renderPagination(employees.length, page, data);
+}
+
+function renderPagination(totalItems, currentPage, data) {
+    const perPage = 20;
+    const pagination = document.getElementById('pagination');
+    const totalPages = Math.ceil(totalItems / perPage);
+    const paginationSecond = document.getElementById('paginationSecond');
+    paginationSecond.style.display = 'none';
+
+    pagination.innerHTML = '';
+
+    for (let i = 1; i <= totalPages; i++) {
+        pagination.innerHTML += `
+            <button class="btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-secondary'}" data-page="${i}">
+                ${i}
+            </button>
+        `;
+    }
+
+    pagination.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            renderTableEmployees(data, Number(btn.dataset.page));
+        });
+    });
 }
 
 function renderTableEmployeeStatistics(data) {
@@ -93,68 +127,102 @@ function renderTableEmployeeStatistics(data) {
     const absenceTypes = data.absenceTypes;
     const statuses = data.statusTypes;
 
-    statisticsTableAttendanceDays.textContent = data.attendanceDays ?? 0;
-    statisticsTableAttendanceHours.textContent = data.attendanceHours ?? 0;
-    statisticsTableAbsenceDays.textContent = data.absenceDays ?? 0;
+    if (statisticsTableAttendanceDays) statisticsTableAttendanceDays.textContent = data.attendanceDays ?? 0;
+    if (statisticsTableAttendanceHours) statisticsTableAttendanceHours.textContent = data.attendanceHours ?? 0;
+    if (statisticsTableAbsenceDays) statisticsTableAbsenceDays.textContent = data.absenceDays ?? 0;
 
-    attendancesTable.innerHTML = `
+    const adminEditEmployeeForm = document.getElementById('adminEditEmployeeForm');
+
+    if (attendancesTable) {
+        attendancesTable.innerHTML = `
         <tr>
             <th>ID</th>
             <th>Time in</th>
             <th>Time out</th>
             <th>Status</th>
+            ${adminEditEmployeeForm ? `<th>Actions</th>` : ''}
         </tr>
     `;
 
-    if (!attendances || attendances.length === 0) {
-        attendancesTable.innerHTML += `
+        if (!attendances || attendances.length === 0) {
+            attendancesTable.innerHTML += `
             <tr>
                 <td colspan="4">No attendances.</td>
             </tr>
         `;
-    } else {
-        attendances.forEach(att => {
-            //${} is template string, it allows for variable values to be printed instead of the variable name
-            attendancesTable.innerHTML += `
+        } else {
+            attendances.forEach(att => {
+                //${} is template string, it allows for variable values to be printed instead of the variable name
+                attendancesTable.innerHTML += `
             <tr>
                 <td>${att.id}</td> 
                 <td>${att.checkInTime}</td>
                 <td>${att.checkOutTime}</td>
                 <td>${statuses.find(s => s.id === att.statusId)?.name ?? ''}</td>
+                ${adminEditEmployeeForm ? `
+                <td>
+                    <a href="?c=admin&a=editAttendance&id=${att.id}" class="btn btn-sm btn-primary">
+                        Edit
+                    </a>
+
+                    <a href="?c=admin&a=deleteAttendance&id=${att.id}" 
+                       class="btn btn-sm btn-danger"
+                       onclick="return confirm('Do you really want to delete attendance?');">
+                        Delete
+                    </a>
+                </td>
+            ` : ''}
             </tr>
         `;
-        });
+            });
+        }
     }
 
-    absencesTable.innerHTML = `
+    if (absencesTable) {
+        absencesTable.innerHTML = `
         <tr>
             <th>ID</th>
             <th>Absence type</th>
             <th>Start</th>
             <th>End</th>
+            ${adminEditEmployeeForm ? `<th>Actions</th>` : ''}
         </tr>
     `;
 
-    if (!absences || absences.length === 0) {
-        absencesTable.innerHTML += `
+        if (!absences || absences.length === 0) {
+            absencesTable.innerHTML += `
             <tr>
                 <td colspan="5">No absences.</td>
             </tr>
         `;
-        return;
-    }
+            return;
+        }
 
-    absences.forEach(abs => {
-        //${} is template string, it allows for variable values to be printed instead of the variable name
-        absencesTable.innerHTML += `
+        absences.forEach(abs => {
+            //${} is template string, it allows for variable values to be printed instead of the variable name
+            absencesTable.innerHTML += `
             <tr>
                 <td>${abs.id}</td> 
                 <td>${absenceTypes.find(a => a.id === abs.absenceTypeId)?.name ?? ''}</td>
                 <td>${abs.startDate}</td>
                 <td>${abs.endDate}</td>
+                ${adminEditEmployeeForm ? `
+                <td>
+                    <a href="?c=admin&a=editAbsence&id=${abs.id}" class="btn btn-sm btn-primary">
+                        Edit
+                    </a>
+
+                    <a href="?c=admin&a=deleteAbsence&id=${abs.id}" 
+                       class="btn btn-sm btn-danger"
+                       onclick="return confirm('Do you really want to delete absence?');">
+                        Delete
+                    </a>
+                </td>
+            ` : ''}
             </tr>
         `;
-    });
+        });
+    }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -162,7 +230,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const select = document.getElementById('filter');
     if (input && select) {
         input.addEventListener('input', async function () {
-            const data = await filterService.filterEmployees(
+            const data = await adminFilter.filterEmployees(
                 select.value,
                 input.value
             );
@@ -171,18 +239,76 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     const dateInput = document.getElementById('statisticsDate');
-    const employeeId = document.getElementById('employeeId').value;
+    const employeeId = document.getElementById('employeeId');
     if (dateInput && employeeId) {
         dateInput.addEventListener('change', async function () {
-            const data = await filterService.filterStatistics(
+            const data = await adminFilter.filterStatistics(
                 dateInput.value,
-                employeeId
+                employeeId.value
             );
             renderTableEmployeeStatistics(data);
         });
 
         dateInput.addEventListener('click', () => {
            dateInput.showPicker();
+        });
+    }
+
+    const dateInputEmp = document.getElementById('statisticsDateEmp');
+    const employeeIdEmp = document.getElementById('employeeId');
+    if (dateInputEmp && employeeIdEmp) {
+        dateInputEmp.addEventListener('change', async function () {
+            const data = await employeeFilter.filterStatistics(
+                dateInputEmp.value,
+                employeeIdEmp.value
+            );
+            renderTableEmployeeStatistics(data);
+        });
+
+        dateInputEmp.addEventListener('click', () => {
+            dateInputEmp.showPicker();
+        });
+    }
+    
+    const startDate = document.getElementById('startDate');
+    if (startDate) {
+        startDate.addEventListener('click', () => {
+            startDate.showPicker();
+        });
+    }
+
+    const endDate = document.getElementById('endDate');
+    if (endDate) {
+        endDate.addEventListener('click', () => {
+            endDate.showPicker();
+        });
+    }
+
+    const checkInTime = document.getElementById('checkInTime');
+    if (checkInTime) {
+        checkInTime.addEventListener('click', () => {
+            checkInTime.showPicker();
+        });
+    }
+
+    const checkOutTime = document.getElementById('checkOutTime');
+    if (checkOutTime) {
+        checkOutTime.addEventListener('click', () => {
+            checkOutTime.showPicker();
+        });
+    }
+
+    const birthDate = document.getElementById('birthDate');
+    if (birthDate) {
+        birthDate.addEventListener('click', () => {
+            birthDate.showPicker();
+        });
+    }
+
+    const hireDate = document.getElementById('hireDate');
+    if (hireDate) {
+        hireDate.addEventListener('click', () => {
+            hireDate.showPicker();
         });
     }
 });

@@ -7,6 +7,7 @@
 /** @var \App\Models\Department[] $departments */
 /** @var \App\Models\AbsenceType[] $absenceTypes */
 /** @var \App\Models\statusType[] $statusTypes */
+/** @var string|null $error */
 ?>
 
 <div class="container">
@@ -14,34 +15,43 @@
 
     <div class="card mb-3">
         <div class="card-body">
-            <form method="post" action="<?= $link->url('admin.updateEmployee') ?>">
+            <form method="post" action="<?= $link->url('admin.updateEmployee') ?>" id="adminEditEmployeeForm">
+                <div style="display: none" class="mb-3">
+                    <label for="employeeId" class="form-label">Id</label>
+                    <input id="employeeId" type="text" name="employeeId" class="form-control" value="<?= htmlspecialchars($employee->getId(), ENT_QUOTES); ?>" readonly required />
+                </div>
                 <div style="display: none" class="mb-3">
                     <label for="id" class="form-label">Id</label>
-                    <input id="id" type="text" name="id" class="form-control" value="<?= htmlspecialchars($employee->getId(), ENT_QUOTES); ?>" readonly />
+                    <input id="id" type="text" name="id" class="form-control" value="<?= htmlspecialchars($employee->getId(), ENT_QUOTES); ?>" readonly required />
                 </div>
+                <?php if(!is_null(@$error)) {?>
+                    <div class="text-center text-danger mb-3">
+                        <?= @$error ?>
+                    </div>
+                <?php } ?>
                 <div class="mb-3">
                     <label for="firstName" class="form-label">First name</label>
-                    <input id="firstName" type="text" name="firstName" class="form-control" value="<?= htmlspecialchars($employee->getFirstName(), ENT_QUOTES); ?>" required />
+                    <input id="firstName" type="text" name="firstName" class="form-control" value="<?= htmlspecialchars($employee->getFirstName(), ENT_QUOTES); ?>" required maxlength="50" />
                 </div>
                 <div class="mb-3">
                     <label for="lastName" class="form-label">Last name</label>
-                    <input id="lastName" type="text" name="lastName" class="form-control" value="<?= htmlspecialchars($employee->getLastName(), ENT_QUOTES); ?>" required />
+                    <input id="lastName" type="text" name="lastName" class="form-control" value="<?= htmlspecialchars($employee->getLastName(), ENT_QUOTES); ?>" required maxlength="50" />
                 </div>
                 <div class="mb-3">
                     <label for="address" class="form-label">Address</label>
-                    <input id="address" type="text" name="address" class="form-control" value="<?= htmlspecialchars($employee->getAddress(), ENT_QUOTES); ?>" required />
+                    <input id="address" type="text" name="address" class="form-control" value="<?= htmlspecialchars($employee->getAddress(), ENT_QUOTES); ?>" required maxlength="100" />
                 </div>
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <input id="email" type="text" name="email" class="form-control" value="<?= htmlspecialchars($employee->getEmail(), ENT_QUOTES); ?>" required />
+                    <input id="email" type="text" name="email" class="form-control" value="<?= htmlspecialchars($employee->getEmail(), ENT_QUOTES); ?>" required maxlength="50" />
                 </div>
                 <div class="mb-3">
                     <label for="phone" class="form-label">Phone number</label>
-                    <input id="phone" type="number" name="phone" class="form-control" value="<?= htmlspecialchars($employee->getPhone(), ENT_QUOTES); ?>" required />
+                    <input id="phone" type="number" name="phone" class="form-control" value="<?= htmlspecialchars($employee->getPhone(), ENT_QUOTES); ?>" required maxlength="20" />
                 </div>
                 <div class="mb-3">
                     <label for="birthDate" class="form-label">Birth date</label>
-                    <input id="birthDate" type="date" name="birthDate" class="form-control" value="<?= htmlspecialchars($employee->getBirthDate(), ENT_QUOTES); ?>" required onfocus="this.showPicker()" />
+                    <input id="birthDate" type="date" name="birthDate" class="form-control" value="<?= htmlspecialchars($employee->getBirthDate(), ENT_QUOTES); ?>" required" />
                 </div>
                 <div class="mb-3">
                     <label for="age" class="form-label">Age</label>
@@ -49,7 +59,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="hireDate" class="form-label">Hire date</label>
-                    <input id="hireDate" type="date" name="hireDate" class="form-control" value="<?= htmlspecialchars($employee->getHireDate(), ENT_QUOTES); ?>" required onfocus="this.showPicker()" />
+                    <input id="hireDate" type="date" name="hireDate" class="form-control" value="<?= htmlspecialchars($employee->getHireDate(), ENT_QUOTES); ?>" required" />
                 </div>
                 <div class="mb-3">
                     <label for="departmentId" class="form-label">Department: </label>
@@ -64,7 +74,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="position" class="form-label">Position</label>
-                    <input id="position" type="text" name="position" class="form-control" value="<?= htmlspecialchars($employee->getPosition(), ENT_QUOTES); ?>" required />
+                    <input id="position" type="text" name="position" class="form-control" value="<?= htmlspecialchars($employee->getPosition(), ENT_QUOTES); ?>" required maxlength="50" />
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
                 <a href="<?= $link->url('admin.show') ?>" class="btn btn-secondary">
@@ -79,19 +89,15 @@
             <form method="post" action="<?= $link->url('admin.updateUser') ?>">
                 <div class="mb-3" style="display: none">
                     <label for="id" class="form-label">Id</label>
-                    <input id="id" type="text" name="id" class="form-control" value="<?= htmlspecialchars($employeeUser->getId(), ENT_QUOTES); ?>" readonly />
+                    <input id="id" type="text" name="id" class="form-control" value="<?= htmlspecialchars($employeeUser->getId(), ENT_QUOTES); ?>" readonly required />
                 </div>
                 <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
-                    <input id="username" type="text" name="username" class="form-control" value="<?= htmlspecialchars($employeeUser->getName(), ENT_QUOTES); ?>" required />
+                    <input id="username" type="text" name="username" class="form-control" value="<?= htmlspecialchars($employeeUser->getName(), ENT_QUOTES); ?>" required maxlength="50" />
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
-                    <input id="password" type="password" name="password" class="form-control"/>
-                </div>
-                <div class="mb-3">
-                    <label for="passwordCheck" class="form-label">Password check</label>
-                    <input id="passwordCheck" type="password" name="passwordCheck" class="form-control"/>
+                    <input id="password" type="password" name="password" class="form-control" maxlength="100" required/>
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
                 <a href="<?= $link->url('admin.show') ?>" class="btn btn-secondary">
@@ -101,9 +107,14 @@
         </div>
     </div>
 
+    <div class="mb-3">
+        <label for="statisticsDate" class="form-label">Filter by date</label>
+        <input id="statisticsDate" type="month" name="statisticsDate" class="form-control" value="<?= htmlspecialchars(date('Y-m'), ENT_QUOTES); ?>" required />
+    </div>
+
     <h2>Attendances</h2>
     <?php if (!empty($attendances)) { ?>
-        <table>
+        <table id="attendancesTable">
             <tr>
                 <th>ID</th>
                 <th>Time in</th>
@@ -138,7 +149,7 @@
 
     <h2>Absences</h2>
     <?php if (!empty($absences)) { ?>
-        <table>
+        <table id="absencesTable">
             <tr>
                 <th>ID</th>
                 <th>Absence type</th>

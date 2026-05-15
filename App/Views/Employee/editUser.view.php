@@ -15,7 +15,7 @@
                 <div class="mb-3">
                     <div class="mb-3" style="display: none">
                         <label for="id" class="form-label">Id</label>
-                        <input id="id" type="text" name="id" class="form-control" value="<?= htmlspecialchars($user->getId(), ENT_QUOTES); ?>" readonly />
+                        <input id="id" type="text" name="id" class="form-control" value="<?= htmlspecialchars($user->getId(), ENT_QUOTES); ?>" readonly required />
                     </div>
 
                     <?php if(!is_null(@$error)) {?>
@@ -26,17 +26,12 @@
 
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
-                        <input id="username" type="text" name="username" class="form-control" value="<?= htmlspecialchars($user->getName(), ENT_QUOTES); ?>"/>
+                        <input id="username" type="text" name="username" class="form-control" value="<?= htmlspecialchars($user->getName(), ENT_QUOTES); ?>" required maxlength="50"/>
                     </div>
 
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
-                        <input id="password" type="password" name="password" class="form-control"/>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="passwordCheck" class="form-label">Password check</label>
-                        <input id="passwordCheck" type="password" name="passwordCheck" class="form-control"/>
+                        <input id="password" type="password" name="password" class="form-control" required maxlength="100"/>
                     </div>
 
                 </div>

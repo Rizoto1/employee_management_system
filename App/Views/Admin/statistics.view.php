@@ -84,6 +84,9 @@
                     </tr>
                 <?php } ?>
             </table>
+            <a href="<?= $link->url('admin.show') ?>" class="btn btn-secondary">
+                Back
+            </a>
         </div>
     </div>
 </div>

@@ -60,6 +60,12 @@ class AdminController extends BaseController
 
         $employee = new Employee();
         $values = $request->post();
+        $numberOfValues = count($values);
+
+        if ($numberOfValues < 8) {
+            return $this->html(['departments' => Department::getAll(), 'error' => 'Please fill in all required fields!']);
+        }
+
         foreach ($values as $val) {
             if ($this->specialChars($val)) {
                 return $this->html(['departments' => Department::getAll(), 'error' => 'Invalid characters!']);
@@ -68,23 +74,36 @@ class AdminController extends BaseController
 
         $employee->setFirstName($request->post('firstName'));
         $employee->setLastName($request->post('lastName'));
-        $employee->setEmail($request->post('email'));
-        $employee->setPhone($request->post('phone'));
+        //email
+        if (filter_var($request->post('email'), FILTER_VALIDATE_EMAIL)) {
+            $employee->setEmail($request->post('email'));
+        } else {
+            return $this->html(['departments' => Department::getAll(), 'error' => 'Invalid email format!']);
+        }
+        //phone
+        if (is_numeric($request->post('phone'))) {
+            $employee->setPhone($request->post('phone'));
+        } else {
+            return $this->html(['departments' => Department::getAll(), 'error' => 'Phone number must be numeric!']);
+        }
         $employee->setAddress($request->post('address'));
         $employee->setBirthDate($request->post('birthDate'));
-        $employee->setDepartmentId(null);
+        if ($employee->getAge() < 18) {
+            return $this->html(['departments' => Department::getAll(), 'error' => 'Employee must be at least 18 years old!']);
+        }
+        $employee->setDepartmentId($request->post('departmentId') !== '0' ? (int)$request->post('departmentId') : null);
         $employee->setPosition($request->post('position'));
         $employee->setHireDate($request->post('hireDate'));
         $employee->save();
 
         $employeeId = $employee->getId();
         $user = new User();
-        $result = strtolower(iconv('UTF-8', 'ASCII//TRANSLIT', $employee->getLastName()));
+        $result = strtolower(substr($employee->getFirstName(), 0, 1) . $employee->getLastName());
         $user->setUsername($result);
         $user->setPassword($result);
         $user->setEmployeeId($employeeId);
-
         $user->save();
+
         return $this->html(['departments' => Department::getAll()]);
     }
 
@@ -93,12 +112,19 @@ class AdminController extends BaseController
         try {
             $id = $request->value('id');
             $user = User::getAll('`employeeId` LIKE ?', [$id])[0];
+            $date = date('Y-m');
+            [$year, $month] = explode('-', $date);
+            $absence = Absence::getAll("`employeeId` = ? AND YEAR(`startDate`) = ? AND MONTH(`startDate`) = ?",
+                [$id, $year, $month]);
+            $attendance = Attendance::getAll("`employeeId` = ? AND YEAR(`checkInTime`) = ? AND MONTH(`checkInTime`) = ?",
+                [$id, $year, $month]);
 
             return $this->html(
                 [
+                    'error' => $request->value('error'),
                     'employee' => Employee::getOne($id),
-                    'attendances' => Attendance::getAll('`employeeId` LIKE ?', [$id]),
-                    'absences' => Absence::getAll('`employeeId` LIKE ?', [$id]),
+                    'attendances' => $attendance,
+                    'absences' => $absence,
                     'departments' => Department::getAll(),
                     'absenceTypes' => AbsenceType::getAll(),
                     'statusTypes' => StatusType::getAll(),
@@ -112,7 +138,8 @@ class AdminController extends BaseController
 
     public function updateEmployee(Request $request): Response {
         if (!$request->isPost()) {
-            return $this->redirect($this->url("admin.editEmployee", ['id' => $request->post('id')]));
+            return $this->redirect($this->url("admin.editEmployee",
+                ['id' => $request->post('id')]));
         }
 
         $employee = Employee::getOne((int)$request->post('id'));
@@ -120,19 +147,51 @@ class AdminController extends BaseController
             throw new HttpException(404);
         }
 
+        $values = $request->post();
+        $numberOfValues = count($values);
+
+        if ($numberOfValues < 8) {
+            return $this->redirect($this->url("admin.editEmployee",
+                ['id' => $request->post('id'), 'error' => 'Please fill in all required fields!']));
+        }
+
+        foreach ($values as $val) {
+            if ($this->specialChars($val)) {
+                return $this->redirect($this->url("admin.editEmployee",
+                    ['id' => $request->post('id'), 'error' => 'Invalid characters!']));
+            }
+        }
+
         $employee->setFirstName($request->post('firstName'));
         $employee->setLastName($request->post('lastName'));
-        $employee->setEmail($request->post('email'));
-        $employee->setPhone($request->post('phone'));
+        //email
+        if (filter_var($request->post('email'), FILTER_VALIDATE_EMAIL)) {
+            $employee->setEmail($request->post('email'));
+        } else {
+            return $this->redirect($this->url("admin.editEmployee",
+                ['id' => $request->post('id'), 'error' => 'Invalid email format!']));
+        }
+        //phone
+        if (is_numeric($request->post('phone'))) {
+            $employee->setPhone($request->post('phone'));
+        } else {
+            return $this->redirect($this->url("admin.editEmployee",
+                ['id' => $request->post('id'), 'error' => 'Phone number must be numeric!']));
+        }
         $employee->setAddress($request->post('address'));
         $employee->setBirthDate($request->post('birthDate'));
+        if ($employee->getAge() < 18) {
+            return $this->redirect($this->url("admin.editEmployee",
+                ['id' => $request->post('id'), 'error' => 'Employee must be at least 18 years old!']));
+        }
         $employee->setDepartmentId($request->post('departmentId') !== '0' ? (int)$request->post('departmentId') : null);
         $employee->setPosition($request->post('position'));
         $employee->setHireDate($request->post('hireDate'));
 
         $employee->save();
 
-        return $this->redirect($this->url("admin.editEmployee", ['id' => $request->post('id')]));
+        return $this->redirect($this->url("admin.editEmployee",
+            ['id' => $request->post('id')]));
     }
 
     public function deleteEmployee(Request $request): Response
@@ -159,7 +218,8 @@ class AdminController extends BaseController
     {
         if (!$request->isPost()) {
             $user = User::getOne((int)$request->post('id'));
-            return $this->redirect($this->url("admin.editEmployee", ['id' => $user->getEmployeeId()]));
+            return $this->redirect($this->url("admin.editEmployee",
+                ['id' => $user->getEmployeeId()]));
         }
 
         try {
@@ -170,12 +230,15 @@ class AdminController extends BaseController
                 throw new HttpException(404);
             }
 
+            if (count($request->post()) < 2) {
+                return $this->redirect($this->url("admin.editEmployee",
+                    ['error' => 'Please fill in all required fields.', 'id' => $user->getEmployeeId()]));
+            }
+
             foreach($request->post() as $value) {
                 if ($this->specialChars($value)) {
                     return $this->redirect($this->url("admin.editEmployee",
-                        ['error' => 'Input cannot contain special characters.',
-                            'id' => $user->getEmployeeId()
-                        ]));
+                        ['error' => 'Input cannot contain special characters.', 'id' => $user->getEmployeeId()]));
                 }
             }
 
@@ -186,7 +249,8 @@ class AdminController extends BaseController
             }
             $user->save();
 
-            return $this->redirect($this->url("admin.editEmployee", ['id' => $user->getEmployeeId()]));
+            return $this->redirect($this->url("admin.editEmployee",
+                ['id' => $user->getEmployeeId()]));
         } catch (\Exception $e) {
             throw new HttpException(500, "DB Chyba: " . $e->getMessage());
         }
@@ -195,7 +259,19 @@ class AdminController extends BaseController
     public function show(Request $request): Response
     {
         try {
-            $employees = Employee::getAll();
+            $page = (int)($request->value('page') ?? 1);
+            if ($page < 1) {
+                $page = 1;
+            }
+            $perPage = 20;
+            $offset = ($page - 1) * $perPage;
+            $employees = Employee::getAll(
+                orderBy: 'id ASC',
+                limit: $perPage,
+                offset: $offset
+            );
+            $totalEmployees = count(Employee::getAll());
+            $totalPages = ceil($totalEmployees / $perPage);
             $statuses = [];
 
             foreach ($employees as $employee) {
@@ -205,7 +281,9 @@ class AdminController extends BaseController
             return $this->html(
                 [
                     'employees' => $employees,
-                    'statuses' => $statuses
+                    'statuses' => $statuses,
+                    'currentPage' => $page,
+                    'totalPages' => $totalPages
                 ]
             );
         } catch (\Exception $e) {
@@ -230,7 +308,7 @@ class AdminController extends BaseController
 
             $statusTypes = StatusType::getAll();
 
-            return $this->html(['attendance' => $attendance, 'employee' => $employee, 'statusTypes' => $statusTypes]);
+            return $this->html(['attendance' => $attendance, 'employee' => $employee, 'statusTypes' => $statusTypes, 'error' => $request->value('error')]);
         } catch (\Exception $e) {
             throw new HttpException(500, "DB Chyba: " . $e->getMessage());
         }
@@ -246,12 +324,27 @@ class AdminController extends BaseController
                 throw new HttpException(404);
             }
 
-            $attendance->setCheckInTime($request->post('checkInTime'));
-            $attendance->setCheckOutTime($request->post('checkOutTime'));
+            $values = $request->post();
+            $numberOfValues = count($values);
+            if ($numberOfValues < 3) {
+                return $this->redirect($this->url("admin.editAttendance",
+                    ['id' => $attendance->getId(), 'error' => 'Please fill in all required fields!']));
+            }
+
+            $checkInTime = $request->post('checkInTime');
+            $checkOutTime = $request->post('checkOutTime');
+            if (new \Datetime($checkInTime) > new \Datetime($checkOutTime)) {
+                return $this->redirect($this->url("admin.editAttendance",
+                    ['id' => $attendance->getId(), 'error' => 'Check-out time cannot be before check-in time!']));
+            }
+
+            $attendance->setCheckInTime($checkInTime);
+            $attendance->setCheckOutTime($checkOutTime);
             $attendance->setStatusId($request->post('statusId'));
             $attendance->save();
 
-            return $this->redirect($this->url("admin.editAttendance", ['id' => $attendance->getId()]));
+            return $this->redirect($this->url("admin.editAttendance",
+                ['id' => $attendance->getId()]));
         } catch (\Exception $e) {
             throw new HttpException(500, "DB Chyba: " . $e->getMessage());
         }
@@ -273,7 +366,8 @@ class AdminController extends BaseController
             throw new HttpException(500, 'DB Error:: ' . $e->getMessage());
         }
 
-        return $this->redirect($this->url("admin.editEmployee", ['id' => $attendance->getEmployeeId()]));
+        return $this->redirect($this->url("admin.editEmployee",
+            ['id' => $attendance->getEmployeeId()]));
     }
 
     public function editAbsence(Request $request): Response
@@ -293,7 +387,7 @@ class AdminController extends BaseController
             $statusTypes = StatusType::getAll();
             $absenceTypes = AbsenceType::getAll();
 
-            return $this->html(['absence' => $absence, 'employee' => $employee, 'statusTypes' => $statusTypes, 'absenceTypes' => $absenceTypes]);
+            return $this->html(['absence' => $absence, 'employee' => $employee, 'statusTypes' => $statusTypes, 'absenceTypes' => $absenceTypes, 'error' => $request->value('error')]);
         } catch (\Exception $e) {
             throw new HttpException(500, "DB Chyba: " . $e->getMessage());
         }
@@ -321,19 +415,6 @@ class AdminController extends BaseController
                 return $this->json(['employees' => $employees,
                     'departments' => Department::getAll(),
                     'statuses' => $statuses]);
-            }
-
-            $allowedFilters = [
-                'firstName',
-                'lastName',
-                'email',
-                'hireDate',
-                'department',
-                'position'
-            ];
-
-            if (!in_array($filter, $allowedFilters)) {
-                return $this->json([]);
             }
 
             if ($filter === 'department') {
@@ -378,12 +459,27 @@ class AdminController extends BaseController
                 throw new HttpException(404);
             }
 
-            $absence->setStartDate($request->post('startDate'));
-            $absence->setEndDate($request->post('endDate'));
+            $values = $request->post();
+            $numberOfValues = count($values);
+            if ($numberOfValues < 3) {
+                return $this->redirect($this->url("admin.editAbsence",
+                    ['id' => $absence->getId(), 'error' => 'Please fill in all required fields!']));
+            }
+
+            $startDate = $request->post('startDate');
+            $endDate = $request->post('endDate');
+            if (new \Datetime($startDate) > new \Datetime($endDate)) {
+                return $this->redirect($this->url("admin.editAbsence",
+                    ['id' => $absence->getId(), 'error' => 'End date cannot be before start date!']));
+            }
+
+            $absence->setStartDate($startDate);
+            $absence->setEndDate($endDate);
             $absence->setAbsenceTypeId($request->post('absenceId'));
             $absence->save();
 
-            return $this->redirect($this->url("admin.editAbsence", ['id' => $absence->getId()]));
+            return $this->redirect($this->url("admin.editAbsence",
+                ['id' => $absence->getId()]));
         } catch (\Exception $e) {
             throw new HttpException(500, "DB Chyba: " . $e->getMessage());
         }
@@ -511,7 +607,7 @@ class AdminController extends BaseController
     }
 
     private function specialChars($str) {
-        return preg_match('/[^a-zA-Z0-9]/', $str) > 0;
+        return preg_match('/[^a-zA-Z0-9@.,\-]/', $str) > 0;
     }
 
     private function getEmployeeStatus($employee): string {
