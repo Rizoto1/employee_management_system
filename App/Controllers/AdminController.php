@@ -67,7 +67,7 @@ class AdminController extends BaseController
         }
 
         foreach ($values as $val) {
-            if ($this->specialChars($val)) {
+            if ($this->specialChars($val) || $val === '') {
                 return $this->html(['departments' => Department::getAll(), 'error' => 'Invalid characters!']);
             }
         }
@@ -156,7 +156,7 @@ class AdminController extends BaseController
         }
 
         foreach ($values as $val) {
-            if ($this->specialChars($val)) {
+            if ($this->specialChars($val) || $val === '') {
                 return $this->redirect($this->url("admin.editEmployee",
                     ['id' => $request->post('id'), 'error' => 'Invalid characters!']));
             }
@@ -236,7 +236,7 @@ class AdminController extends BaseController
             }
 
             foreach($request->post() as $value) {
-                if ($this->specialChars($value)) {
+                if ($this->specialChars($value) || $value === '') {
                     return $this->redirect($this->url("admin.editEmployee",
                         ['error' => 'Input cannot contain special characters.', 'id' => $user->getEmployeeId()]));
                 }
@@ -607,7 +607,7 @@ class AdminController extends BaseController
     }
 
     private function specialChars($str) {
-        return preg_match('/[^a-zA-Z0-9@.,\-]/', $str) > 0;
+        return preg_match('/[^a-zA-Z0-9@.,:\- ]/', $str) > 0;
     }
 
     private function getEmployeeStatus($employee): string {

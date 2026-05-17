@@ -7,11 +7,11 @@
 
 <div class="container">
     <form method="post" action="<?= $link->url('employee.addAbsence')?>">
-        <?php if(!is_null(@$error)) {?>
-            <div class="text-center text-danger mb-3">
+        <div class="text-center text-danger mb-3" id="error">
+            <?php if(!is_null(@$error)) {?>
                 <?= @$error ?>
-            </div>
-        <?php } ?>
+            <?php } ?>
+        </div>
         <div style="display: none">
             <label for="name" class="form-label">Name</label>
             <input id="name" type="text" name="name" class="form-control" value="<?= $user->getName() ?>" required readonly/>

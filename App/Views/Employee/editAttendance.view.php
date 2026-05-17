@@ -20,11 +20,11 @@
                         <input id="id" type="text" name="id" class="form-control" value="<?= htmlspecialchars($attendance->getId(), ENT_QUOTES); ?>" readonly required />
                     </div>
 
-                    <?php if(!is_null(@$error)) {?>
-                        <div class="text-center text-danger mb-3">
+                    <div class="text-center text-danger mb-3" id="error">
+                        <?php if(!is_null(@$error)) {?>
                             <?= @$error ?>
-                        </div>
-                    <?php } ?>
+                        <?php } ?>
+                    </div>
 
                     <div class="mb-3">
                         <p>

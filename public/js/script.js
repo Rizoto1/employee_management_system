@@ -17,6 +17,10 @@ function calculateAge(birthDate) {
 
     return age;
 }
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
 
 function renderTableEmployees(data, page = 1) {
     const perPage = 20;
@@ -299,9 +303,21 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     const birthDate = document.getElementById('birthDate');
+    const error = document.getElementById('error');
+    const submitBtn = document.getElementById('submit');
     if (birthDate) {
+        birthDate.addEventListener('change', () => {
+            if (error && calculateAge(birthDate.value) < 18 && submitBtn) {
+                error.innerHTML = 'Employee must be at least 18 years old';
+                submitBtn.disabled = true;
+            } else if(error && submitBtn) {
+                error.innerHTML = '';
+                submitBtn.disabled = false;
+            }
+        });
         birthDate.addEventListener('click', () => {
             birthDate.showPicker();
+
         });
     }
 
@@ -309,6 +325,19 @@ window.addEventListener('DOMContentLoaded', () => {
     if (hireDate) {
         hireDate.addEventListener('click', () => {
             hireDate.showPicker();
+        });
+    }
+
+    const email = document.getElementById('email');
+    if (email) {
+        email.addEventListener('input', () => {
+            if (error && !validateEmail(email.value) && submitBtn) {
+                error.innerHTML='Invalid email address';
+                submitBtn.disabled = true;
+            } else if (error && submitBtn) {
+                error.innerHTML='';
+                submitBtn.disabled = false;
+            }
         });
     }
 });

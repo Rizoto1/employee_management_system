@@ -12,11 +12,11 @@
     <div class="card mb-3">
         <div class="card-body">
             <h5 class="card-title"><?= htmlspecialchars($employee->getFirstName() . ' ' . $employee->getLastName(), ENT_QUOTES); ?></h5>
-            <?php if(!is_null(@$error)) {?>
-                <div class="text-center text-danger mb-3">
+            <div class="text-center text-danger mb-3" id="error">
+                <?php if(!is_null(@$error)) {?>
                     <?= @$error ?>
-                </div>
-            <?php } ?>
+                <?php } ?>
+            </div>
             <form method="post" action="<?= $link->url('admin.updateAttendance')?>">
                 <div class="mb-3">
                     <div class="mb-3" style="display: none">

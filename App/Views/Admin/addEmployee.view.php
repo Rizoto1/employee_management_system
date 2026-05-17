@@ -5,11 +5,11 @@
 ?>
 
 <div class="container">
-    <?php if(!is_null(@$error)) {?>
-        <div class="text-center text-danger mb-3">
+    <div class="text-center text-danger mb-3" id="error">
+        <?php if(!is_null(@$error)) {?>
             <?= @$error ?>
-        </div>
-    <?php } ?>
+        <?php } ?>
+    </div>
     <form method="post" action="<?= $link->url('admin.addEmployee')?>">
         <div class="mb-3">
             <label for="firstName" class="form-label">First name</label>
@@ -54,7 +54,7 @@
             <label for="position" class="form-label">Position</label>
             <input id="position" type="text" name="position" class="form-control" placeholder="Insert position here" required maxlength="50" />
         </div>
-        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" id="submit" class="btn btn-primary">Save</button>
         <a href="<?= $link->url('admin.show') ?>" class="btn btn-secondary">
             Back
         </a>

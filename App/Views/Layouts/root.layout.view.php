@@ -18,7 +18,7 @@
 </head>
 <body>
 <div class="container-fluid vh-100">
-    <div class="row h-100"> <!-- h-100 - to have sidebar and others full height-->
+    <div class="row h-100">
 
         <!-- SIDEBAR -->
         <div class="sidebar col-12 col-md-3 col-lg-2 bg-dark text-white p-3 d-flex flex-column align-items-center">
@@ -35,9 +35,6 @@
             <?php } else { ?>
                 <a href="<?= $link->url("employee.index")?>">
                     <button type="button" class="btn btn-primary m-2">Home</button>
-                </a>
-                <a href="<?= $link->url("employee.statistics", ['name' => $user->getName()])?>">
-                    <button type="button" class="btn btn-primary m-2">Statistics</button>
                 </a>
                 <a href="<?= $link->url("employee.addAbsence", ['name' => $user->getName()])?>">
                     <button type="button" class="btn btn-primary m-2">Add absence</button>

@@ -47,11 +47,11 @@ class EmployeeController extends BaseController
 
         $date = date('Y-m');
         [$year, $month] = explode('-', $date);
-        $absence = Absence::getAll("`employeeId` = ? AND YEAR(`startDate`) = ? AND MONTH(`startDate`) = ?",
+        $absences = Absence::getAll("`employeeId` = ? AND YEAR(`startDate`) = ? AND MONTH(`startDate`) = ?",
             [$employee->getId(), $year, $month], 'startDate DESC');
         $absenceDays = 0;
 
-        foreach ($absence as $a) {
+        foreach ($absences as $a) {
             $start = new \DateTime($a->getStartDate());
             if ($a->getEndDate() === null) {
                 $end = new \DateTime();
@@ -85,7 +85,7 @@ class EmployeeController extends BaseController
         $date = date('Y-m');
         [$year, $month] = explode('-', $date);
         $attendance = Attendance::getAll("`employeeId` = ? AND YEAR(`checkInTime`) = ? AND MONTH(`checkInTime`) = ?",
-            [$employee->getId(), $year, $month]);
+            [$employee->getId(), $year, $month], 'checkInTime DESC');
 
         $attendanceDays = 0;
         $attendanceHours = 0;
@@ -128,7 +128,7 @@ class EmployeeController extends BaseController
             }
 
             foreach($values as $value) {
-                if ($this->specialChars($value)) {
+                if ($this->specialChars($value) || $value === '') {
                     return $this->html(['error' => "Invalid input: special characters are not allowed.", 'absenceTypes' => $absenceTypes]);
                 }
             }
@@ -195,7 +195,7 @@ class EmployeeController extends BaseController
             $endDate = new \DateTime($request->post('endDate'));
 
             foreach($request->post() as $value) {
-                if ($this->specialChars($value)) {
+                if ($this->specialChars($value)  || $value === '') {
                     return $this->redirect($this->url("employee.editAbsence",
                         ['error' => 'Invalid input: special character are not allowed.',
                             'id' => $id, 'employee' => $employee,'absenceType' => $absenceType
@@ -241,7 +241,7 @@ class EmployeeController extends BaseController
             $employeeId = $user->getEmployeeId();
 
             foreach($request->post() as $value) {
-                if ($this->specialChars($value)) {
+                if ($this->specialChars($value) || $value === '') {
                     return $this->html(['error' => "Invalid input: special characters are not allowed.", 'statusTypes' => $statusTypes]);
                 }
             }
@@ -301,7 +301,7 @@ class EmployeeController extends BaseController
             $checkOutTime = new \DateTime($request->value('checkOutTime'));
 
             foreach($request->post() as $value) {
-                if ($this->specialChars($value)) {
+                if ($this->specialChars($value) || $value === '') {
                     return $this->redirect($this->url("employee.editAttendance",
                         ['error' => 'Invalid input: special characters are not allowed.',
                             'id' => $id, 'employee' => $employee,'statusType' => $statusType
@@ -363,7 +363,7 @@ class EmployeeController extends BaseController
             }
 
             foreach($request->post() as $value) {
-                if ($this->specialChars($value)) {
+                if ($this->specialChars($value) || $value === '') {
                     return $this->redirect($this->url("employee.editUser",
                         ['error' => 'Input cannot contain special characters.',
                             'name' => $user->getName()
@@ -442,6 +442,6 @@ class EmployeeController extends BaseController
     }
 
     private function specialChars($str) {
-        return preg_match('/[^a-zA-Z0-9@.,\-]/', $str) > 0;
+        return preg_match('/[^a-zA-Z0-9@.,:\- ]/', $str) > 0;
     }
 }

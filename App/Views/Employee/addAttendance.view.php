@@ -2,14 +2,16 @@
 /** @var \Framework\Support\LinkGenerator $link */
 /** @var \App\Models\StatusType[] $statusTypes */
 /** @var \Framework\Auth\AppUser $user */
-/** @var string $error */
+/** @var string|null $error */
 
 ?>
 
 <div class="container">
     <form method="post" action="<?= $link->url('employee.addAttendance')?>">
-        <div class="text-center text-danger mb-3">
-            <?= @$error ?>
+        <div class="text-center text-danger mb-3" id="error">
+            <?php if(!is_null(@$error)) {?>
+                <?= @$error ?>
+            <?php } ?>
         </div>
         <div style="display: none">
             <label for="name" class="form-label">Name</label>

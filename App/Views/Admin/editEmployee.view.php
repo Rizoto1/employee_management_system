@@ -24,11 +24,11 @@
                     <label for="id" class="form-label">Id</label>
                     <input id="id" type="text" name="id" class="form-control" value="<?= htmlspecialchars($employee->getId(), ENT_QUOTES); ?>" readonly required />
                 </div>
-                <?php if(!is_null(@$error)) {?>
-                    <div class="text-center text-danger mb-3">
+                <div class="text-center text-danger mb-3" id="error">
+                    <?php if(!is_null(@$error)) {?>
                         <?= @$error ?>
-                    </div>
-                <?php } ?>
+                    <?php } ?>
+                </div>
                 <div class="mb-3">
                     <label for="firstName" class="form-label">First name</label>
                     <input id="firstName" type="text" name="firstName" class="form-control" value="<?= htmlspecialchars($employee->getFirstName(), ENT_QUOTES); ?>" required maxlength="50" />
@@ -55,7 +55,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="age" class="form-label">Age</label>
-                    <input id="age" type="number" name="age" class="form-control" value="<?= htmlspecialchars($employee->getAge(), ENT_QUOTES); ?>" required />
+                    <input id="age" type="number" name="age" class="form-control" value="<?= htmlspecialchars($employee->getAge(), ENT_QUOTES); ?>" readonly />
                 </div>
                 <div class="mb-3">
                     <label for="hireDate" class="form-label">Hire date</label>
@@ -76,7 +76,7 @@
                     <label for="position" class="form-label">Position</label>
                     <input id="position" type="text" name="position" class="form-control" value="<?= htmlspecialchars($employee->getPosition(), ENT_QUOTES); ?>" required maxlength="50" />
                 </div>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" id="submit" class="btn btn-primary">Save</button>
                 <a href="<?= $link->url('admin.show') ?>" class="btn btn-secondary">
                     Back
                 </a>
@@ -106,6 +106,11 @@
             </form>
         </div>
     </div>
+
+    <a href="<?= $link->url('statistics', ['id' => $employee->getId()]) ?>"
+       class="btn btn-sm btn-secondary">
+        Statistics
+    </a>
 
     <div class="mb-3">
         <label for="statisticsDate" class="form-label">Filter by date</label>

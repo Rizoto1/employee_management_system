@@ -29,6 +29,7 @@
 .topbar {
     position: sticky;
     top: 0;
+    z-index: 1000;
 }
 
 .navbar-brand img {
@@ -70,17 +71,24 @@ table td:last-child {
     font-weight: bold;
 }
 
+.btn-primary:disabled {
+    background-color: lightgray;
+    border-color: lightgray;
+    color: white;
+    cursor: not-allowed;
+}
+
 .btn-secondary {
     background-color: cornflowerblue;
     border-color: antiquewhite;
     font-weight: bold;
 }
 
-input[type="text"], input[type="number"], input[type="date"], input[type="month"], input[type="datetime-local"], select {
+input[type="text"], input[type="number"], input[type="date"], input[type="month"], input[type="datetime-local"], input[type="password"] select {
     background-color: cornsilk;
     border: 2px solid antiquewhite;
 }
 
-input[type="text"]:focus, input[type="number"]:focus , input[type="date"]:focus, input[type="month"]:focus, input[type="datetime-local"]:focus {
+input[type="text"]:focus, input[type="number"]:focus , input[type="date"]:focus, input[type="month"]:focus, input[type="datetime-local"]:focus, input[type="password"]:focus {
     background-color: cornsilk;
 }

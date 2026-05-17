@@ -28,7 +28,6 @@
             <tr>
                 <th>Total days worked</th>
                 <th>Total hours worked</th>
-                <th>Total absences</th>
             </tr>
             <tr>
                 <td id="attendanceDays"><?= htmlspecialchars($attendanceDays, ENT_QUOTES)?></td>
