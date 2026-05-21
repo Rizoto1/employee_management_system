@@ -13,8 +13,6 @@ use Framework\Core\BaseController;
 use Framework\Http\HttpException;
 use Framework\Http\Request;
 use Framework\Http\Responses\Response;
-use http\Exception\RuntimeException;
-use const Grpc\STATUS_ABORTED;
 
 /**
  * Class AdminController
@@ -66,31 +64,36 @@ class AdminController extends BaseController
             return $this->html(['departments' => Department::getAll(), 'error' => 'Please fill in all required fields!']);
         }
 
-        foreach ($values as $val) {
-            if ($this->specialChars($val) || $val === '') {
+        foreach ($values as $value) {
+            if ($this->specialChars($value) || $value === '') {
                 return $this->html(['departments' => Department::getAll(), 'error' => 'Invalid characters!']);
             }
         }
 
         $employee->setFirstName($request->post('firstName'));
         $employee->setLastName($request->post('lastName'));
+
         //email
         if (filter_var($request->post('email'), FILTER_VALIDATE_EMAIL)) {
             $employee->setEmail($request->post('email'));
         } else {
             return $this->html(['departments' => Department::getAll(), 'error' => 'Invalid email format!']);
         }
+
         //phone
         if (is_numeric($request->post('phone'))) {
             $employee->setPhone($request->post('phone'));
         } else {
             return $this->html(['departments' => Department::getAll(), 'error' => 'Phone number must be numeric!']);
         }
+
         $employee->setAddress($request->post('address'));
+
         $employee->setBirthDate($request->post('birthDate'));
         if ($employee->getAge() < 18) {
             return $this->html(['departments' => Department::getAll(), 'error' => 'Employee must be at least 18 years old!']);
         }
+
         $employee->setDepartmentId($request->post('departmentId') !== '0' ? (int)$request->post('departmentId') : null);
         $employee->setPosition($request->post('position'));
         $employee->setHireDate($request->post('hireDate'));
@@ -112,6 +115,11 @@ class AdminController extends BaseController
         try {
             $id = $request->value('id');
             $user = User::getAll('`employeeId` LIKE ?', [$id])[0];
+
+            if (is_null($user)) {
+                throw new HttpException(404);
+            }
+
             $date = date('Y-m');
             [$year, $month] = explode('-', $date);
             $absence = Absence::getAll("`employeeId` = ? AND YEAR(`startDate`) = ? AND MONTH(`startDate`) = ?",
@@ -132,14 +140,14 @@ class AdminController extends BaseController
                 ]
             );
         } catch (\Exception $e) {
-            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+            throw new HttpException(500, "DB Error: " . $e->getMessage());
         }
     }
 
     public function updateEmployee(Request $request): Response {
         if (!$request->isPost()) {
             return $this->redirect($this->url("admin.editEmployee",
-                ['id' => $request->post('id')]));
+                ['id' => $request->post('id'), 'error' => 'Invalid request method!']));
         }
 
         $employee = Employee::getOne((int)$request->post('id'));
@@ -164,6 +172,7 @@ class AdminController extends BaseController
 
         $employee->setFirstName($request->post('firstName'));
         $employee->setLastName($request->post('lastName'));
+
         //email
         if (filter_var($request->post('email'), FILTER_VALIDATE_EMAIL)) {
             $employee->setEmail($request->post('email'));
@@ -171,6 +180,7 @@ class AdminController extends BaseController
             return $this->redirect($this->url("admin.editEmployee",
                 ['id' => $request->post('id'), 'error' => 'Invalid email format!']));
         }
+
         //phone
         if (is_numeric($request->post('phone'))) {
             $employee->setPhone($request->post('phone'));
@@ -178,12 +188,15 @@ class AdminController extends BaseController
             return $this->redirect($this->url("admin.editEmployee",
                 ['id' => $request->post('id'), 'error' => 'Phone number must be numeric!']));
         }
+
         $employee->setAddress($request->post('address'));
+
         $employee->setBirthDate($request->post('birthDate'));
         if ($employee->getAge() < 18) {
             return $this->redirect($this->url("admin.editEmployee",
                 ['id' => $request->post('id'), 'error' => 'Employee must be at least 18 years old!']));
         }
+
         $employee->setDepartmentId($request->post('departmentId') !== '0' ? (int)$request->post('departmentId') : null);
         $employee->setPosition($request->post('position'));
         $employee->setHireDate($request->post('hireDate'));
@@ -204,11 +217,11 @@ class AdminController extends BaseController
                 throw new HttpException(404);
             }
 
-            Employee::deleteRelated($id);
+            $employee->deleteRelated();
             $employee->delete();
 
         } catch (Exception $e) {
-            throw new HttpException(500, 'DB Error:: ' . $e->getMessage());
+            throw new HttpException(500, 'DB Error: ' . $e->getMessage());
         }
 
         return $this->redirect($this->url("admin.show"));
@@ -216,13 +229,13 @@ class AdminController extends BaseController
 
     public function updateUser(Request $request): Response
     {
-        if (!$request->isPost()) {
-            $user = User::getOne((int)$request->post('id'));
-            return $this->redirect($this->url("admin.editEmployee",
-                ['id' => $user->getEmployeeId()]));
-        }
-
         try {
+            if (!$request->isPost()) {
+                $user = User::getOne((int)$request->value('id'));
+                return $this->redirect($this->url("admin.editEmployee",
+                    ['id' => $user->getEmployeeId()]));
+            }
+
             $id = (int)$request->post('id');
 
             $user = User::getOne($id);
@@ -243,16 +256,13 @@ class AdminController extends BaseController
             }
 
             $user->setUsername($request->post('username'));
-            $password = $request->post('password');
-            if (!empty($password)) {
-                $user->setPassword($request->post('password'));
-            }
+            $user->setPassword($request->post('password'));
             $user->save();
 
             return $this->redirect($this->url("admin.editEmployee",
                 ['id' => $user->getEmployeeId()]));
         } catch (\Exception $e) {
-            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+            throw new HttpException(500, "DB Error: " . $e->getMessage());
         }
     }
 
@@ -275,7 +285,7 @@ class AdminController extends BaseController
             $statuses = [];
 
             foreach ($employees as $employee) {
-                $statuses[$employee->getId()] = $this->getEmployeeStatus($employee);
+                $statuses[$employee->getId()] = $employee->getEmployeeStatus();
             }
 
             return $this->html(
@@ -287,7 +297,7 @@ class AdminController extends BaseController
                 ]
             );
         } catch (\Exception $e) {
-            throw new \HttpException(500, "DB Chyba: " . $e->getMessage());
+            throw new \HttpException(500, "DB Error: " . $e->getMessage());
         }
     }
 
@@ -302,7 +312,7 @@ class AdminController extends BaseController
             }
 
             $employee = Employee::getOne($attendance->getEmployeeId());
-            if (is_null($attendance)) {
+            if (is_null($employee)) {
                 throw new HttpException(404);
             }
 
@@ -310,14 +320,14 @@ class AdminController extends BaseController
 
             return $this->html(['attendance' => $attendance, 'employee' => $employee, 'statusTypes' => $statusTypes, 'error' => $request->value('error')]);
         } catch (\Exception $e) {
-            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+            throw new HttpException(500, "DB Error: " . $e->getMessage());
         }
     }
 
     public function updateAttendance(Request $request): Response
     {
         try {
-            $id = (int)$request->value('id');
+            $id = (int)$request->post('id');
 
             $attendance = Attendance::getOne($id);
             if (is_null($attendance)) {
@@ -346,7 +356,7 @@ class AdminController extends BaseController
             return $this->redirect($this->url("admin.editAttendance",
                 ['id' => $attendance->getId()]));
         } catch (\Exception $e) {
-            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+            throw new HttpException(500, "DB Error: " . $e->getMessage());
         }
     }
 
@@ -363,7 +373,7 @@ class AdminController extends BaseController
             $attendance->delete();
 
         } catch (Exception $e) {
-            throw new HttpException(500, 'DB Error:: ' . $e->getMessage());
+            throw new HttpException(500, 'DB Error: ' . $e->getMessage());
         }
 
         return $this->redirect($this->url("admin.editEmployee",
@@ -380,7 +390,7 @@ class AdminController extends BaseController
             }
 
             $employee = Employee::getOne($absence->getEmployeeId());
-            if (is_null($absence)) {
+            if (is_null($employee)) {
                 throw new HttpException(404);
             }
 
@@ -389,7 +399,7 @@ class AdminController extends BaseController
 
             return $this->html(['absence' => $absence, 'employee' => $employee, 'statusTypes' => $statusTypes, 'absenceTypes' => $absenceTypes, 'error' => $request->value('error')]);
         } catch (\Exception $e) {
-            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+            throw new HttpException(500, "DB Error: " . $e->getMessage());
         }
     }
 
@@ -398,20 +408,22 @@ class AdminController extends BaseController
         try {
             $data = $request->json();
 
+            $employees = Employee::getAll();
+            $statuses = [];
+            foreach ($employees as $employee) {
+                $statuses[$employee->getId()] = $employee->getEmployeeStatus();
+            }
+
             if (!is_object($data)) {
-                return $this->json([]);
+                return $this->json(['employees' => $employees,
+                    'departments' => Department::getAll(),
+                    'statuses' => $statuses]);
             }
 
             $filter = $data->filter ?? null;
             $filterValue = $data->filterValue ?? null;
 
             if ($filter === null || $filterValue === null || $filterValue === '') {
-                $employees = Employee::getAll();
-                $statuses = [];
-                foreach ($employees as $employee) {
-                    $statuses[$employee->getId()] = $this->getEmployeeStatus($employee);
-                }
-
                 return $this->json(['employees' => $employees,
                     'departments' => Department::getAll(),
                     'statuses' => $statuses]);
@@ -420,32 +432,29 @@ class AdminController extends BaseController
             if ($filter === 'department') {
                 $departments = Department::GetAll("`name` LIKE ?", ["%$filterValue%"]);
                 if(empty($departments)) {
-                    $employees = Employee::getAll();
-                    $statuses = [];
-                    foreach ($employees as $employee) {
-                        $statuses[$employee->getId()] = $this->getEmployeeStatus($employee);
-                    }
-
                     return $this->json(['employees' => $employees,
                                         'departments' => Department::getAll(),
                                         'statuses' => $statuses]);
                 }
-                $department = $departments[0];
-                $employees = Employee::getAll("`departmentId` = ?", [$department->getId()]);
+
+                $employees = [];
+                foreach($departments as $department) {
+                    $employees += Employee::getAll("`departmentId` = ?", [$department->getId()]);
+                }
             } else {
                 $employees = Employee::getAll("`$filter` LIKE ?", ["%$filterValue%"]);
             }
 
             $statuses = [];
             foreach ($employees as $employee) {
-                $statuses[$employee->getId()] = $this->getEmployeeStatus($employee);
+                $statuses[$employee->getId()] = $employee->getEmployeeStatus();
             }
 
             return $this->json(['employees' => $employees,
                                 'departments' => Department::getAll(),
                                 'statuses' => $statuses]);
         } catch (\Exception $e) {
-            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+            throw new HttpException(500, "DB Error: " . $e->getMessage());
         }
     }
 
@@ -481,7 +490,7 @@ class AdminController extends BaseController
             return $this->redirect($this->url("admin.editAbsence",
                 ['id' => $absence->getId()]));
         } catch (\Exception $e) {
-            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+            throw new HttpException(500, "DB Error: " . $e->getMessage());
         }
     }
 
@@ -498,7 +507,7 @@ class AdminController extends BaseController
             $absence->delete();
 
         } catch (Exception $e) {
-            throw new HttpException(500, 'DB Error:: ' . $e->getMessage());
+            throw new HttpException(500, 'DB Error: ' . $e->getMessage());
         }
 
         return $this->redirect($this->url("admin.editEmployee", ['id' => $absence->getEmployeeId()]));
@@ -515,9 +524,9 @@ class AdminController extends BaseController
         $date = date('Y-m');
         [$year, $month] = explode('-', $date);
 
-        $attendance = Attendance::getAll("`employeeId` = ? AND YEAR(`checkInTime`) = ? AND MONTH(`checkInTime`) = ?",
+        $attendances = Attendance::getAll("`employeeId` = ? AND YEAR(`checkInTime`) = ? AND MONTH(`checkInTime`) = ?",
                                         [$employee->getId(), $year, $month]);
-        $absence = Absence::getAll("`employeeId` = ? AND YEAR(`startDate`) = ? AND MONTH(`startDate`) = ?",
+        $absences = Absence::getAll("`employeeId` = ? AND YEAR(`startDate`) = ? AND MONTH(`startDate`) = ?",
                                     [$employee->getId(), $year, $month]);
         $absenceTypes = AbsenceType::getAll();
         $statusTypes = StatusType::getAll();
@@ -526,7 +535,7 @@ class AdminController extends BaseController
         $attendanceDays = 0;
         $attendanceHours = 0;
 
-        foreach ($absence as $a) {
+        foreach ($absences as $a) {
             $start = new \DateTime($a->getStartDate());
             if ($a->getEndDate() === null) {
                 $end = new \DateTime();
@@ -536,16 +545,19 @@ class AdminController extends BaseController
             $absenceDays += $start->diff($end)->days + 1;
         }
 
-        foreach ($attendance as $a) {
-            if ($a->getCheckOutTime() !== null) {
-                $start = new \DateTime($a->getCheckInTime());
+        foreach ($attendances as $a) {
+            $start = new \DateTime($a->getCheckInTime());
+            if ($a->getCheckOutTime() === null) {
+                $end = new \DateTime();
+            } else {
                 $end = new \DateTime($a->getCheckOutTime());
-                $attendanceHours += ($end->getTimestamp() - $start->getTimestamp()) / 3600;
-                $attendanceDays += 1;
             }
+            $attendanceHours += ($end->getTimestamp() - $start->getTimestamp()) / 3600;
+            $days = $start->diff($end)->days + 1;
+            $attendanceDays += $days;
         }
 
-        return $this->html(['employee' => $employee, 'attendances' => $attendance, 'absences' => $absence, 'absenceTypes' => $absenceTypes, 'statusTypes' => $statusTypes,
+        return $this->html(['employee' => $employee, 'attendances' => $attendances, 'absences' => $absences, 'absenceTypes' => $absenceTypes, 'statusTypes' => $statusTypes,
             'attendanceDays' => $attendanceDays, 'attendanceHours' => $attendanceHours, 'absenceDays' => $absenceDays]);
     }
 
@@ -559,21 +571,30 @@ class AdminController extends BaseController
 
             $date = $data->date ?? null;
             if ($date === null || $date === '') {
-                return $this->json(['absences' => Absence::getAll("`employeeId` = ?", [$data->employeeId]),
-                                    'attendances' => Attendance::getAll("`employeeId` = ?", [$data->employeeId])]);
+                $absences = [];
+                $attendances = [];
+                return $this->json([
+                    'absences' => $absences,
+                    'attendances' => $attendances,
+                    'attendanceDays' => 0,
+                    'attendanceHours' => 0,
+                    'absenceDays' => 0,
+                    'absenceTypes' => AbsenceType::getAll(),
+                    'statusTypes' => StatusType::getAll()
+                ]);
             }
 
             [$year, $month] = explode('-', $date);
-            $absence = Absence::getAll("`employeeId` = ? AND YEAR(`startDate`) = ? AND MONTH(`startDate`) = ?",
+            $absences = Absence::getAll("`employeeId` = ? AND YEAR(`startDate`) = ? AND MONTH(`startDate`) = ?",
                 [$data->employeeId, $year, $month]);
-            $attendance = Attendance::getAll("`employeeId` = ? AND YEAR(`checkInTime`) = ? AND MONTH(`checkInTime`) = ?",
+            $attendances = Attendance::getAll("`employeeId` = ? AND YEAR(`checkInTime`) = ? AND MONTH(`checkInTime`) = ?",
                 [$data->employeeId, $year, $month]);
 
             $absenceDays = 0;
             $attendanceDays = 0;
             $attendanceHours = 0;
 
-            foreach ($absence as $a) {
+            foreach ($absences as $a) {
                 $start = new \DateTime($a->getStartDate());
                 if ($a->getEndDate() === null) {
                     $end = new \DateTime();
@@ -583,18 +604,21 @@ class AdminController extends BaseController
                 $absenceDays += $start->diff($end)->days + 1;
             }
 
-            foreach ($attendance as $a) {
-                if ($a->getCheckOutTime() !== null) {
-                    $start = new \DateTime($a->getCheckInTime());
+            foreach ($attendances as $a) {
+                $start = new \DateTime($a->getCheckInTime());
+                if ($a->getCheckOutTime() === null) {
+                    $end = new \DateTime();
+                } else {
                     $end = new \DateTime($a->getCheckOutTime());
-                    $attendanceHours += ($end->getTimestamp() - $start->getTimestamp()) / 3600;
-                    $attendanceDays += 1;
                 }
+                $attendanceHours += ($end->getTimestamp() - $start->getTimestamp()) / 3600;
+                $days = $start->diff($end)->days + 1;
+                $attendanceDays += $days;
             }
 
             return $this->json([
-                'absences' => $absence,
-                'attendances' => $attendance,
+                'absences' => $absences,
+                'attendances' => $attendances,
                 'attendanceDays' => $attendanceDays,
                 'attendanceHours' => $attendanceHours,
                 'absenceDays' => $absenceDays,
@@ -602,30 +626,11 @@ class AdminController extends BaseController
                 'statusTypes' => StatusType::getAll()
             ]);
         } catch (\Exception $e) {
-            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+            throw new HttpException(500, "DB Error: " . $e->getMessage());
         }
     }
 
-    private function specialChars($str) {
-        return preg_match('/[^a-zA-Z0-9@.,:\- ]/', $str) > 0;
-    }
-
-    private function getEmployeeStatus($employee): string {
-        $id = $employee->getId();
-        $absences = Absence::getAll('`employeeId` LIKE ?', [$id], 'startDate DESC');
-        $attendances = Attendance::getAll('`employeeId` LIKE ?', [$id], 'checkInTime DESC');
-
-        $latestAbsence = !empty($absences) ? $absences[0] : null;
-        $latestAttendance = !empty($attendances) ? $attendances[0] : null;
-
-        $status = 'Absent';
-
-        if ($latestAbsence && !$latestAbsence->getEndDate()) {
-            $status = AbsenceType::getOne($latestAbsence->getAbsenceTypeId())->getName();
-        } else if ($latestAttendance && !$latestAttendance->getCheckOutTime()) {
-            $status = StatusType::getOne($latestAttendance->getStatusId())->getName();
-        }
-
-        return $status;
+    private function specialChars(string $str): bool {
+        return preg_match('/[^a-zA-ZÀ-ž0-9@.,:\- ]/', $str) > 0;
     }
 }

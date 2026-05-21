@@ -2,7 +2,7 @@
 /** @var \Framework\Support\LinkGenerator $link */
 /** @var \App\Models\Attendance[] $attendances */
 /** @var \App\Models\StatusType[] $statusTypes */
-/** @var string $error */
+/** @var string|null $error */
 /** @var \App\Models\Employee $employee */
 /** @var $attendanceDays */
 /** @var $attendanceHours */
@@ -10,9 +10,11 @@
 
 <div class="container">
     <h2>Attendances</h2>
-    <div class="text-center text-danger mb-3">
-        <?= @$error ?>
-    </div>
+    <?php if(!is_null(@$error)) {?>
+        <div class="text-center text-danger mb-3">
+            <?= htmlspecialchars($error, ENT_QUOTES) ?>
+        </div>
+    <?php } ?>
 
     <div>
         <input type="hidden" id="employeeId" value="<?= htmlspecialchars($employee->getId(), ENT_QUOTES); ?>">

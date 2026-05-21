@@ -4,14 +4,14 @@
 /** @var \App\Models\AbsenceType[] $absenceTypes */
 /** @var \App\Models\Employee $employee */
 /** @var int $absenceDays */
-/** @var string $error */
+/** @var string|null $error */
 ?>
 
 <div class="container">
     <h2>Absences</h2>
     <?php if(!is_null(@$error)) {?>
         <div class="text-center text-danger mb-3">
-            <?= @$error ?>
+            <?= htmlspecialchars($error, ENT_QUOTES) ?>
         </div>
     <?php } ?>
 

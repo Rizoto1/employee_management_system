@@ -8,7 +8,6 @@ class AbsenceType extends Model
 {
     protected ?int $id = null;
     protected string $name = '';
-    protected string $description = '';
 
     public function getId(): ?int
     {
@@ -20,11 +19,6 @@ class AbsenceType extends Model
         return $this->name;
     }
 
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
     public function setId(int $id): void
     {
         $this->id = $id;
@@ -33,10 +27,5 @@ class AbsenceType extends Model
     public function setName(string $name): void
     {
         $this->name = $name;
-    }
-
-    public function setDescription(string $description): void
-    {
-        $this->description = $description;
     }
 }

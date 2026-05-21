@@ -8,7 +8,6 @@ class Department extends Model
 {
     protected ?int $id = null;
     protected string $name = '';
-    protected string $description = '';
 
     public function getId(): ?int
     {
@@ -20,11 +19,6 @@ class Department extends Model
         return $this->name;
     }
 
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
     public function setId(int $id): void
     {
         $this->id = $id;
@@ -34,11 +28,4 @@ class Department extends Model
     {
         $this->name = $name;
     }
-
-    public function setDescription(string $description): void
-    {
-        $this->description = $description;
-    }
-
-
 }

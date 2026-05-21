@@ -27,7 +27,7 @@ class HomeController extends BaseController
      */
     public function authorize(Request $request, string $action): bool
     {
-        return true;
+        return false;
     }
 
     /**

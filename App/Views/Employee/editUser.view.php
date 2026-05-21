@@ -20,7 +20,7 @@
 
                     <div class="text-center text-danger mb-3" id="error">
                         <?php if(!is_null(@$error)) {?>
-                            <?= @$error ?>
+                            <?= htmlspecialchars($error, ENT_QUOTES) ?>
                         <?php } ?>
                     </div>
 

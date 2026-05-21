@@ -138,8 +138,9 @@ class Employee extends Model
         $this->hireDate = $hireDate;
     }
 
-    public static function deleteRelated(int $id): void
+    public function deleteRelated(): void
     {
+        $id = $this->id;
         $con = Connection::getInstance();
         $stmt = $con->prepare("DELETE FROM users WHERE employeeId = :id");
         $stmt->execute(['id' => $id]);
@@ -149,5 +150,24 @@ class Employee extends Model
 
         $stmt = $con->prepare("DELETE FROM attendances WHERE employeeId = :id");
         $stmt->execute(['id' => $id]);
+    }
+
+    public function getEmployeeStatus(): string {
+        $id = $this->id;
+        $absences = Absence::getAll('`employeeId` LIKE ?', [$id], 'startDate DESC');
+        $attendances = Attendance::getAll('`employeeId` LIKE ?', [$id], 'checkInTime DESC');
+
+        $latestAbsence = !empty($absences) ? $absences[0] : null;
+        $latestAttendance = !empty($attendances) ? $attendances[0] : null;
+
+        $status = 'Absent';
+
+        if ($latestAbsence && !$latestAbsence->getEndDate()) {
+            $status = AbsenceType::getOne($latestAbsence->getAbsenceTypeId())->getName();
+        } else if ($latestAttendance && !$latestAttendance->getCheckOutTime()) {
+            $status = StatusType::getOne($latestAttendance->getStatusId())->getName();
+        }
+
+        return $status;
     }
 }

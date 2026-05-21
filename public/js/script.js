@@ -1,9 +1,5 @@
 import { Filter } from "./Filter.js";
 
-const adminFilter = new Filter("admin");
-const employeeFilter = new Filter("employee");
-let currentPage = 1;
-
 function calculateAge(birthDate) {
     const today = new Date();
     const birth = new Date(birthDate);
@@ -17,11 +13,17 @@ function calculateAge(birthDate) {
 
     return age;
 }
+
 function validateEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
 }
 
+/**
+ * Renders the employees table with pagination.
+ * @param {Object} data - The data containing employees, departments, and statuses.
+ * @param {number} page - The current page number (default is 1).
+ */
 function renderTableEmployees(data, page = 1) {
     const perPage = 20;
     const table = document.getElementById('employeesTable');
@@ -29,7 +31,6 @@ function renderTableEmployees(data, page = 1) {
     const departments = data.departments;
     const statuses = data.statuses;
 
-    currentPage = page;
     const start = (page - 1) * perPage;
     const end = start + perPage;
     const paginatedEmployees = employees.slice(start, end);
@@ -61,7 +62,6 @@ function renderTableEmployees(data, page = 1) {
     }
 
     paginatedEmployees.forEach(emp => {
-        //${} is template string, it allows for variable values to be printed instead of the variable name
         table.innerHTML += `
             <tr>
                 <td>${emp.id}</td> 
@@ -95,6 +95,12 @@ function renderTableEmployees(data, page = 1) {
     renderPagination(employees.length, page, data);
 }
 
+/**
+ * Renders pagination buttons based on the total number of items and the current page.
+ * @param {number} totalItems - The total number of items to paginate.
+ * @param {number} currentPage - The current page number.
+ * @param {Object} data - The data containing employees, departments, and statuses.
+ */
 function renderPagination(totalItems, currentPage, data) {
     const perPage = 20;
     const pagination = document.getElementById('pagination');
@@ -119,6 +125,10 @@ function renderPagination(totalItems, currentPage, data) {
     });
 }
 
+/**
+ * Renders the employee statistics tables for absences and attendances.
+ * @param {Object} data - The data containing absences, attendances, absence types, attendance days, attendance hours, absence days and status types.
+ */
 function renderTableEmployeeStatistics(data) {
     const absencesTable = document.getElementById('absencesTable');
     const attendancesTable = document.getElementById('attendancesTable');
@@ -156,7 +166,6 @@ function renderTableEmployeeStatistics(data) {
         `;
         } else {
             attendances.forEach(att => {
-                //${} is template string, it allows for variable values to be printed instead of the variable name
                 attendancesTable.innerHTML += `
             <tr>
                 <td>${att.id}</td> 
@@ -203,7 +212,6 @@ function renderTableEmployeeStatistics(data) {
         }
 
         absences.forEach(abs => {
-            //${} is template string, it allows for variable values to be printed instead of the variable name
             absencesTable.innerHTML += `
             <tr>
                 <td>${abs.id}</td> 
@@ -230,6 +238,9 @@ function renderTableEmployeeStatistics(data) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+    const adminFilter = new Filter("admin");
+    const employeeFilter = new Filter("employee");
+
     const input = document.getElementById('filterValue');
     const select = document.getElementById('filter');
     if (input && select) {

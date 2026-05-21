@@ -55,29 +55,28 @@
             <a href="<?= $link->url("auth.logout")?>">
                 <button type="button" class="btn btn-primary m-2">Log out</button>
             </a>
-
         </div>
 
         <!-- RIGHT SIDE -->
         <div class=" main-content col-12 col-md-9 col-lg-10 d-flex flex-column p-0">
 
             <!-- TOPBAR -->
-            <div class="topbar bg-dark text-white p-3">
-                <nav class="navbar navbar-expand-sm">
+            <div class="topbar bg-dark p-3">
+                <nav class="navbar">
                     <div class="container-fluid">
                         <?php if ($user->isLoggedIn()) { ?>
-                            <span class="navbar-text">Logged in user: <b><?= $user->getName() ?></b></span>
-                            <ul class="navbar-nav ms-auto">
-                                <li class="nav-item">
-                                    <a class="nav-link" href="<?= $link->url('auth.logout') ?>">
+                            <span>Logged in user: <b><?= $user->getName() ?></b></span>
+                            <ul class="navbar-nav">
+                                <li>
+                                    <a href="<?= $link->url('auth.logout') ?>">
                                         <button class="btn btn-primary">Log out</button>
                                     </a>
                                 </li>
                             </ul>
                         <?php } else { ?>
-                            <ul class="navbar-nav ms-auto">
-                                <li class="nav-item">
-                                    <a class="nav-link" href="<?= App\Configuration::LOGIN_URL ?>">
+                            <ul class="navbar-nav">
+                                <li>
+                                    <a href="<?= App\Configuration::LOGIN_URL ?>">
                                         <button class="btn-primary">Log in</button>
                                     </a>
                                 </li>
@@ -89,7 +88,7 @@
 
             <!-- CONTENT -->
             <div class="flex-grow-1 p-3">
-                <div class="web-content">
+                <div>
                     <?= $contentHTML ?>
                 </div>
             </div>

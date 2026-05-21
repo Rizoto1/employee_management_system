@@ -14,7 +14,6 @@ use Framework\Http\Request;
 use Framework\Http\Responses\Response;
 use http\Exception\RuntimeException;
 
-
 class EmployeeController extends BaseController
 {
     public function authorize(Request $request, string $action): bool
@@ -149,7 +148,7 @@ class EmployeeController extends BaseController
 
             return $this->redirect($this->url("employee.showAbsences", ['name' => $name]));
         } catch (\Exception $e) {
-            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+            throw new HttpException(500, "DB Error: " . $e->getMessage());
         }
     }
 
@@ -163,7 +162,7 @@ class EmployeeController extends BaseController
             }
 
             $employee = Employee::getOne($absence->getEmployeeId());
-            if (is_null($absence)) {
+            if (is_null($employee)) {
                 throw new HttpException(404);
             }
 
@@ -171,7 +170,7 @@ class EmployeeController extends BaseController
 
             return $this->html(['error' => $request->value('error'), 'absence' => $absence, 'employee' => $employee,'absenceType' => $absenceType]);
         } catch (\Exception $e) {
-            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+            throw new HttpException(500, "DB Error: " . $e->getMessage());
         }
     }
 
@@ -215,7 +214,7 @@ class EmployeeController extends BaseController
 
             return $this->redirect($this->url("employee.editAbsence", ['id' => $id, 'employee' => $employee,'absenceType' => $absenceType]));
         } catch (\Exception $e) {
-            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+            throw new HttpException(500, "DB Error: " . $e->getMessage());
         }
     }
 
@@ -254,7 +253,7 @@ class EmployeeController extends BaseController
 
             return $this->redirect($this->url("employee.showAttendances", ['name' => $name]));
         } catch (\Exception $e) {
-            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+            throw new HttpException(500, "DB Error: " . $e->getMessage());
         }
     }
 
@@ -269,7 +268,7 @@ class EmployeeController extends BaseController
             }
 
             $employee = Employee::getOne($attendance->getEmployeeId());
-            if (is_null($attendance)) {
+            if (is_null($employee)) {
                 throw new HttpException(404);
             }
 
@@ -277,7 +276,7 @@ class EmployeeController extends BaseController
 
             return $this->html(['error' => $request->value('error'), 'attendance' => $attendance, 'employee' => $employee, 'statusType' => $statusType]);
         } catch (\Exception $e) {
-            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+            throw new HttpException(500, "DB Error: " . $e->getMessage());
         }
     }
 
@@ -321,7 +320,7 @@ class EmployeeController extends BaseController
 
             return $this->redirect($this->url("employee.editAttendance", ['id' => $id, 'employee' => $employee, 'statusType' => $statusType]));
         } catch (\Exception $e) {
-            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+            throw new HttpException(500, "DB Error: " . $e->getMessage());
         }
     }
 
@@ -344,7 +343,7 @@ class EmployeeController extends BaseController
 
             return $this->html(['user' => $user, 'employee' => $employee, 'error' => $request->value('error')]);
         } catch (\Exception $e) {
-            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+            throw new HttpException(500, "DB Error: " . $e->getMessage());
         }
     }
 
@@ -380,7 +379,7 @@ class EmployeeController extends BaseController
 
             return $this->redirect($this->url("auth.logout"));
         } catch (\Exception $e) {
-            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+            throw new HttpException(500, "DB Error: " . $e->getMessage());
         }
     }
 
@@ -394,21 +393,30 @@ class EmployeeController extends BaseController
 
             $date = $data->date ?? null;
             if ($date === null || $date === '') {
-                return $this->json(['absences' => Absence::getAll("`employeeId` = ?", [$data->employeeId]),
-                    'attendances' => Attendance::getAll("`employeeId` = ?", [$data->employeeId])]);
+                $absences = [];
+                $attendances = [];
+                return $this->json([
+                    'absences' => $absences,
+                    'attendances' => $attendances,
+                    'attendanceDays' => 0,
+                    'attendanceHours' => 0,
+                    'absenceDays' => 0,
+                    'absenceTypes' => AbsenceType::getAll(),
+                    'statusTypes' => StatusType::getAll()
+                ]);
             }
 
             [$year, $month] = explode('-', $date);
-            $absence = Absence::getAll("`employeeId` = ? AND YEAR(`startDate`) = ? AND MONTH(`startDate`) = ?",
+            $absences = Absence::getAll("`employeeId` = ? AND YEAR(`startDate`) = ? AND MONTH(`startDate`) = ?",
                 [$data->employeeId, $year, $month]);
-            $attendance = Attendance::getAll("`employeeId` = ? AND YEAR(`checkInTime`) = ? AND MONTH(`checkInTime`) = ?",
+            $attendances = Attendance::getAll("`employeeId` = ? AND YEAR(`checkInTime`) = ? AND MONTH(`checkInTime`) = ?",
                 [$data->employeeId, $year, $month]);
 
             $absenceDays = 0;
             $attendanceDays = 0;
             $attendanceHours = 0;
 
-            foreach ($absence as $a) {
+            foreach ($absences as $a) {
                 $start = new \DateTime($a->getStartDate());
                 if ($a->getEndDate() === null) {
                     $end = new \DateTime();
@@ -418,18 +426,21 @@ class EmployeeController extends BaseController
                 $absenceDays += $start->diff($end)->days + 1;
             }
 
-            foreach ($attendance as $a) {
-                if ($a->getCheckOutTime() !== null) {
-                    $start = new \DateTime($a->getCheckInTime());
+            foreach ($attendances as $a) {
+                $start = new \DateTime($a->getCheckInTime());
+                if ($a->getCheckOutTime() === null) {
+                    $end = new \DateTime();
+                } else {
                     $end = new \DateTime($a->getCheckOutTime());
-                    $attendanceHours += ($end->getTimestamp() - $start->getTimestamp()) / 3600;
-                    $attendanceDays += 1;
                 }
+                $attendanceHours += ($end->getTimestamp() - $start->getTimestamp()) / 3600;
+                $days = $start->diff($end)->days + 1;
+                $attendanceDays += $days;
             }
 
             return $this->json([
-                'absences' => $absence,
-                'attendances' => $attendance,
+                'absences' => $absences,
+                'attendances' => $attendances,
                 'attendanceDays' => $attendanceDays,
                 'attendanceHours' => $attendanceHours,
                 'absenceDays' => $absenceDays,
@@ -437,11 +448,11 @@ class EmployeeController extends BaseController
                 'statusTypes' => StatusType::getAll()
             ]);
         } catch (\Exception $e) {
-            throw new HttpException(500, "DB Chyba: " . $e->getMessage());
+            throw new HttpException(500, "DB Error: " . $e->getMessage());
         }
     }
 
-    private function specialChars($str) {
-        return preg_match('/[^a-zA-Z0-9@.,:\- ]/', $str) > 0;
+    private function specialChars(string $str): bool {
+        return preg_match('/[^a-zA-ZÀ-ž0-9@.,:\- ]/', $str) > 0;
     }
 }

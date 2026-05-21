@@ -1,10 +1,3 @@
-<?php
-
-/** @var \Framework\Support\LinkGenerator $link */
-/** @var \Framework\Auth\AppUser $user */
-/** @var string $error */
-?>
-
 <div class="container-fluid">
     <div class="row">
         <div class="col">
