@@ -12,7 +12,6 @@ use Framework\Core\BaseController;
 use Framework\Http\HttpException;
 use Framework\Http\Request;
 use Framework\Http\Responses\Response;
-use http\Exception\RuntimeException;
 
 class EmployeeController extends BaseController
 {
@@ -127,7 +126,7 @@ class EmployeeController extends BaseController
             }
 
             foreach($values as $value) {
-                if ($this->specialChars($value) || $value === '') {
+                if ($this->specialChars($value)) {
                     return $this->html(['error' => "Invalid input: special characters are not allowed.", 'absenceTypes' => $absenceTypes]);
                 }
             }
@@ -453,6 +452,6 @@ class EmployeeController extends BaseController
     }
 
     private function specialChars(string $str): bool {
-        return preg_match('/[^a-zA-ZÀ-ž0-9@.,:\- ]/', $str) > 0;
+        return preg_match('/[^a-zA-Z0-9@.,:\- ]/', $str) > 0;
     }
 }

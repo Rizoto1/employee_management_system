@@ -251,6 +251,14 @@ window.addEventListener('DOMContentLoaded', () => {
             );
             renderTableEmployees(data);
         });
+
+        select.addEventListener('change', async function () {
+            const data = await adminFilter.filterEmployees(
+                select.value,
+                input.value
+            );
+            renderTableEmployees(data);
+        });
     }
 
     const dateInput = document.getElementById('statisticsDate');

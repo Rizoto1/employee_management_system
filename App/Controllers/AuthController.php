@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use App\Configuration;
-use App\Models\User;
 use Exception;
 use Framework\Core\BaseController;
 use Framework\Http\Request;
