@@ -105,8 +105,6 @@ function renderPagination(totalItems, currentPage, data) {
     const perPage = 20;
     const pagination = document.getElementById('pagination');
     const totalPages = Math.ceil(totalItems / perPage);
-    const paginationSecond = document.getElementById('paginationSecond');
-    paginationSecond.style.display = 'none';
 
     pagination.innerHTML = '';
 
