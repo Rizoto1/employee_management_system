@@ -276,12 +276,11 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     const dateInputEmp = document.getElementById('statisticsDateEmp');
-    const employeeIdEmp = document.getElementById('employeeId');
-    if (dateInputEmp && employeeIdEmp) {
+    if (dateInputEmp && employeeId) {
         dateInputEmp.addEventListener('change', async function () {
             const data = await employeeFilter.filterStatistics(
                 dateInputEmp.value,
-                employeeIdEmp.value
+                employeeId.value
             );
             renderTableEmployeeStatistics(data);
         });
